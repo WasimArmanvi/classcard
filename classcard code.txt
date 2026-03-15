@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="SchoolApp"/>
+<title>School Communication App</title>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCL8y8dt2UD7GZ6fXnWt-XmK3vsfPDIndw",
+    authDomain: "classcard-e7094.firebaseapp.com",
+    projectId: "classcard-e7094",
+    storageBucket: "classcard-e7094.firebasestorage.app",
+    messagingSenderId: "518381416522",
+    appId: "1:518381416522:web:8ac3aaf8464d702c1e36b3",
+    measurementId: "G-9EJKB3E6MQ"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+<style>
+/* ═══ RESET & BASE ═══════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --primary:#0D1B4B;
+  --primary-light:#1A3A6B;
+  --accent:#B8960C;
+  --accent2:#E67E22;
+  --green:#1A7A4A;
+  --red:#C0392B;
+  --gray:#F2F4F8;
+  --border:#D8DCE6;
+  --text:#1C1C2E;
+  --text2:#6B7280;
+  --white:#FFFFFF;
+  --shadow:0 4px 20px rgba(13,27,75,0.12);
+  --radius:12px;
+}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--gray);color:var(--text);min-height:100vh;}
+input,select,textarea,button{font-family:inherit;}
+
+/* ═══ AUTH SCREEN ════════════════════════════════════════ */
+#auth-screen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);
+  padding:20px;
+}
+.auth-box{
+  background:var(--white);border-radius:20px;padding:36px 32px;
+  width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.3);
+}
+.auth-logo{text-align:center;margin-bottom:28px;}
+.auth-logo h1{font-size:28px;font-weight:900;color:var(--primary);letter-spacing:1px;}
+.auth-logo p{font-size:13px;color:var(--text2);margin-top:4px;}
+.auth-logo .logo-icon{
+  width:70px;height:70px;background:linear-gradient(135deg,var(--primary),var(--primary-light));
+  border-radius:18px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;
+  font-size:32px;box-shadow:0 8px 24px rgba(13,27,75,0.3);
+}
+.auth-tabs{display:flex;background:var(--gray);border-radius:10px;padding:4px;margin-bottom:24px;}
+.auth-tab{flex:1;padding:9px;text-align:center;border:none;background:none;cursor:pointer;border-radius:8px;font-size:13px;font-weight:600;color:var(--text2);transition:all 0.2s;}
+.auth-tab.on{background:var(--white);color:var(--primary);box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+.auth-err{background:#FDEDEC;color:var(--red);padding:10px 14px;border-radius:8px;font-size:12px;margin-bottom:14px;display:none;}
+.fld{margin-bottom:14px;}
+.fld label{font-size:11px;font-weight:700;color:var(--primary);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;}
+.fld input,.fld select{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;outline:none;transition:border 0.2s;background:#FAFBFC;}
+.fld input:focus,.fld select:focus{border-color:var(--primary);}
+.auth-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;letter-spacing:0.5px;}
+.auth-btn:active{transform:scale(0.98);}
+.divider{text-align:center;color:var(--text2);font-size:12px;margin:16px 0;position:relative;}
+.divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border);}
+.divider::before{left:0;}.divider::after{right:0;}
+
+/* ═══ MAIN APP ═══════════════════════════════════════════ */
+#app-screen{display:none;flex-direction:column;min-height:100vh;}
+
+/* Header */
+.app-hdr{
+  background:linear-gradient(135deg,var(--primary),var(--primary-light));
+  padding:12px 16px;display:flex;align-items:center;gap:12px;
+  position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,0.2);
+}
+.app-hdr-logo{
+  width:36px;height:36px;background:var(--accent);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;color:var(--primary);flex-shrink:0;
+}
+.app-hdr-info{flex:1;}
+.app-hdr-info h1{color:#fff;font-size:14px;font-weight:800;}
+.app-hdr-info p{color:#ffffff55;font-size:9px;}
+.app-hdr-actions{display:flex;gap:8px;align-items:center;}
+.plan-badge{background:var(--accent);color:var(--primary);padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;}
+.plan-badge.expired{background:var(--red);color:#fff;}
+.hdr-btn{background:rgba(255,255,255,0.15);border:none;color:#fff;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:700;}
+
+/* Bottom nav */
+.bottom-nav{
+  background:var(--white);border-top:1px solid var(--border);
+  display:flex;position:sticky;bottom:0;z-index:100;
+  box-shadow:0 -4px 20px rgba(0,0,0,0.08);
+}
+.nav-btn{
+  flex:1;padding:10px 4px 8px;border:none;background:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-size:9px;font-weight:700;color:var(--text2);transition:all 0.2s;
+}
+.nav-btn .nav-icon{font-size:20px;line-height:1;}
+.nav-btn.on{color:var(--primary);}
+.nav-btn.on .nav-icon{transform:scale(1.1);}
+
+/* Pages */
+.page-wrap{flex:1;overflow-y:auto;padding:12px;max-width:860px;margin:0 auto;width:100%;}
+.pg{display:none;}.pg.on{display:block;}
+
+/* Cards */
+.sec-hdr{
+  background:linear-gradient(135deg,var(--primary),var(--primary-light));
+  border-radius:var(--radius) var(--radius) 0 0;padding:14px 18px;margin-bottom:14px;
+}
+.sec-hdr h2{color:#fff;font-size:15px;font-weight:800;}
+.sec-hdr p{color:#ffffff77;font-size:10px;margin-top:2px;}
+.ui-card{background:var(--white);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:14px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;}
+
+/* Form fields */
+.f{margin-bottom:10px;}
+.f label{font-size:10px;font-weight:700;color:var(--primary);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px;}
+.f input,.f select,.f textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;outline:none;background:#FAFBFC;transition:border 0.2s;}
+.f input:focus,.f select:focus{border-color:var(--primary);}
+.f textarea{resize:vertical;min-height:55px;}
+
+/* Buttons */
+.btn{border:none;border-radius:10px;padding:11px 16px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;display:inline-block;}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-green{background:var(--green);color:#fff;}
+.btn-accent{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--primary);}
+.btn-red{background:var(--red);color:#fff;}
+.btn-ghost{background:var(--gray);color:var(--primary);}
+.btn-full{width:100%;display:block;text-align:center;padding:13px;}
+.btn-sm{padding:7px 12px;font-size:11px;}
+.btn-wa{background:#25D366;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;display:block;text-align:center;text-decoration:none;margin-top:8px;box-shadow:0 3px 12px rgba(37,211,102,0.3);}
+
+/* Student grid */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:12px;}
+.sbtn{
+  background:var(--white);border:2px solid var(--primary);border-radius:10px;
+  padding:10px 12px;cursor:pointer;text-align:left;width:100%;transition:all 0.15s;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+}
+.sbtn:hover,.sbtn:active{background:var(--primary);color:#fff;}
+.sbtn .sn{font-size:12px;font-weight:800;}
+.sbtn .sd{font-size:10px;opacity:0.65;margin-top:2px;}
+
+/* Output */
+.out-box{margin-top:14px;}
+.out-tabs{display:flex;gap:6px;margin-bottom:10px;}
+.out-tab{padding:8px 16px;border:2px solid var(--border);border-radius:20px;cursor:pointer;font-size:12px;font-weight:700;color:var(--text2);background:var(--white);}
+.out-tab.on{border-color:var(--primary);background:var(--primary);color:#fff;}
+.img-wrap{border-radius:var(--radius);overflow:hidden;overflow-x:auto;border:2px solid var(--border);background:#E8EBF0;-webkit-overflow-scrolling:touch;}
+.img-wrap img{display:block;height:auto;}
+.msg-box{background:#ECF3FF;border-radius:var(--radius);padding:14px;font-family:monospace;font-size:11px;line-height:1.9;color:#1a1a2e;white-space:pre-wrap;word-break:break-word;max-height:380px;overflow-y:auto;}
+.save-hint{background:linear-gradient(135deg,#E8F5E9,#F0FFF4);border-radius:10px;padding:11px 13px;margin-top:9px;font-size:11px;color:#1A5C35;line-height:1.8;border:1px solid #A8D5B5;}
+
+/* HW table */
+.hw-tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.hw-tbl th{background:var(--primary);color:#fff;padding:7px 9px;text-align:left;font-size:10px;letter-spacing:0.4px;}
+.hw-tbl td{padding:5px 7px;border-bottom:1px solid #E8EBF0;}
+.hw-tbl td input{border:none;border-bottom:1px solid var(--border);background:transparent;width:100%;font-size:11px;padding:2px 3px;outline:none;}
+.hw-tbl tr:nth-child(even) td{background:#F8F9FA;}
+
+/* Marks */
+.mk-box{background:var(--gray);border-radius:8px;padding:8px;border:1px solid #E0E4EA;}
+.mk-box .sn{font-size:9px;font-weight:700;color:var(--primary);margin-bottom:4px;text-transform:uppercase;}
+.mk-box input{width:44px;padding:4px;font-size:11px;border:1px solid var(--border);border-radius:4px;text-align:center;}
+
+/* Fee rows */
+.fee-row{display:flex;gap:6px;margin-bottom:6px;align-items:center;}
+.fee-row input{flex:1;padding:7px 9px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;}
+.fee-amt{width:90px!important;}
+.fee-del{background:#FDEDEC;color:var(--red);border:none;border-radius:5px;padding:5px 8px;cursor:pointer;}
+
+/* Schedule */
+.sr{display:grid;grid-template-columns:0.8fr 0.9fr 1fr 0.9fr 1.2fr 26px;gap:4px;margin-bottom:4px;}
+.sr input{padding:5px 6px;font-size:11px;border:1.5px solid var(--border);border-radius:6px;}
+.db{background:#FDEDEC;color:var(--red);border:none;border-radius:4px;padding:4px 7px;cursor:pointer;}
+
+/* Students table */
+.std-tbl{background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.std-th{display:grid;grid-template-columns:30px 1.5fr 70px 1fr 80px;background:var(--primary);color:#fff;padding:9px 12px;font-size:10px;font-weight:700;gap:8px;}
+.std-tr{display:grid;grid-template-columns:30px 1.5fr 70px 1fr 80px;padding:9px 12px;font-size:11px;border-bottom:1px solid var(--gray);gap:8px;align-items:center;}
+.badge{background:#EBF5FF;color:var(--primary);border-radius:10px;padding:2px 7px;font-weight:700;font-size:9px;}
+.act-btn{border:none;border-radius:5px;padding:4px 8px;cursor:pointer;font-size:10px;font-weight:700;}
+
+/* Branding swatches */
+.sw-row{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap;}
+.sw{width:28px;height:28px;border-radius:50%;border:3px solid #fff;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.25);}
+
+/* Subscription expired overlay */
+.locked-overlay{
+  position:fixed;inset:0;background:rgba(13,27,75,0.95);z-index:999;
+  display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px;text-align:center;
+}
+.locked-overlay h2{color:#fff;font-size:22px;font-weight:800;margin-bottom:12px;}
+.locked-overlay p{color:#ffffffaa;font-size:14px;margin-bottom:24px;line-height:1.6;}
+.locked-overlay a{color:var(--accent);font-weight:700;}
+
+/* Admin panel */
+.school-card{background:var(--white);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);margin-bottom:10px;display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;}
+.school-info .sn{font-weight:800;font-size:13px;color:var(--text);}
+.school-info .sd{font-size:11px;color:var(--text2);margin-top:2px;}
+.status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.status-dot.active{background:var(--green);}
+.status-dot.expired{background:var(--red);}
+.status-dot.trial{background:var(--accent2);}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:14px;}
+.stat-card{background:var(--white);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);text-align:center;}
+.stat-card .num{font-size:28px;font-weight:900;color:var(--primary);}
+.stat-card .lbl{font-size:11px;color:var(--text2);margin-top:4px;}
+
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}
+
+/* Loading */
+.loader{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--text2);}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;margin-right:12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+canvas{position:absolute;left:-9999px;top:-9999px;}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+</style>
+</head>
+<body>
+
+<!-- ═══ AUTH SCREEN ════════════════════════════════════ -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="logo-icon">📚</div>
+      <h1 id="auth-app-name">SCHOOL APP</h1>
+      <p id="auth-tagline">Professional School Communication</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab on" onclick="switchAuthTab('login',this)">Sign In</button>
+      <button class="auth-tab" onclick="switchAuthTab('signup',this)">Register</button>
+    </div>
+    <div class="auth-err" id="auth-err"></div>
+
+    <!-- LOGIN -->
+    <div id="auth-login">
+      <div class="fld"><label>Email</label><input id="l-email" type="email" placeholder="school@email.com"/></div>
+      <div class="fld"><label>Password</label><input id="l-pass" type="password" placeholder="••••••••"/></div>
+      <button class="auth-btn" onclick="doLogin()">Sign In →</button>
+      <div class="divider">or</div>
+      <button class="auth-btn" style="background:linear-gradient(135deg,#B8960C,#D4A813)" onclick="doAdminLogin()">Admin Login</button>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="auth-signup" style="display:none">
+      <div class="fld"><label>School Name</label><input id="s-sname" placeholder="e.g. Al-Noor School"/></div>
+      <div class="fld"><label>Email</label><input id="s-email" type="email" placeholder="school@email.com"/></div>
+      <div class="fld"><label>Password</label><input id="s-pass" type="password" placeholder="Min 6 characters"/></div>
+      <div class="fld"><label>City</label><input id="s-city" placeholder="e.g. Lahore"/></div>
+      <button class="auth-btn" onclick="doSignup()">Create Account →</button>
+      <p style="font-size:11px;color:var(--text2);text-align:center;margin-top:12px">Free 14-day trial. No credit card required.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ LOCKED OVERLAY ════════════════════════════════ -->
+<div class="locked-overlay" id="locked-overlay">
+  <div style="font-size:60px;margin-bottom:16px">🔒</div>
+  <h2>Subscription Expired</h2>
+  <p>Your subscription has ended.<br>Contact us to renew and regain access to all features.</p>
+  <a id="renew-wa" href="#" target="_blank" class="auth-btn" style="display:inline-block;text-decoration:none;padding:12px 28px;background:linear-gradient(135deg,#B8960C,#D4A813);color:#0D1B4B;border-radius:10px;font-weight:700;font-size:14px">📱 Contact to Renew</a>
+</div>
+
+<!-- ═══ MAIN APP ════════════════════════════════════════ -->
+<div id="app-screen">
+
+  <!-- Header -->
+  <div class="app-hdr">
+    <div class="app-hdr-logo" id="app-logo">📚</div>
+    <div class="app-hdr-info">
+      <h1 id="app-school-name">Loading...</h1>
+      <p id="app-school-sub">School Communication System</p>
+    </div>
+    <div class="app-hdr-actions">
+      <span class="plan-badge" id="plan-badge">TRIAL</span>
+      <button class="hdr-btn" onclick="doLogout()">Exit</button>
+    </div>
+  </div>
+
+  <!-- Page Content -->
+  <div class="page-wrap">
+
+    <!-- DIARY -->
+    <div id="pg-diary" class="pg on">
+      <div class="sec-hdr"><h2>📝 Daily Work & Remarks</h2><p>Generate diary card → Save image → Send via WhatsApp</p></div>
+      <div class="ui-card">
+        <div class="g3">
+          <div class="f"><label>Date</label><input id="d-date"/></div>
+          <div class="f"><label>Class</label><select id="d-cls"></select></div>
+          <div class="f"><label>Section</label><input id="d-sec" placeholder="A"/></div>
+        </div>
+        <div style="font-weight:700;color:var(--primary);font-size:11px;margin:8px 0 6px;text-transform:uppercase">📚 Homework</div>
+        <table class="hw-tbl">
+          <thead><tr><th style="width:95px">Date</th><th style="width:120px">Subject</th><th>Homework / Classwork</th><th style="width:95px">Teacher Init.</th></tr></thead>
+          <tbody id="hw-tbody"></tbody>
+        </table>
+        <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="addHW()">+ Add Row</button>
+        <div class="g2" style="margin-top:10px">
+          <div class="f"><label>Remarks</label><input id="d-rmk" placeholder="Keep up the good work!"/></div>
+          <div class="f"><label>Next Class</label><input id="d-nxt" placeholder="Bring calculator Monday"/></div>
+        </div>
+      </div>
+      <input id="d-srch" style="width:100%;padding:9px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;outline:none;margin-bottom:10px;background:var(--white)" placeholder="🔍 Search by name, roll no, class..." oninput="fS('d')"/>
+      <div id="d-stds" class="sgrid"></div>
+      <div id="d-out" class="out-box" style="display:none">
+        <div class="out-tabs">
+          <button class="out-tab on" onclick="swO('d','i',this)">🖼 Image Card</button>
+          <button class="out-tab" onclick="swO('d','m',this)">💬 WA Message</button>
+        </div>
+        <div id="d-iw"><div class="img-wrap"><img id="d-img"/></div></div>
+        <div id="d-mw" class="msg-box" style="display:none"></div>
+        <div class="save-hint" id="d-ht">🤖 Long-press image → Save → WhatsApp → Attach → Send ✅</div>
+        <a id="d-wa" href="#" target="_blank" class="btn-wa">📱 Open WhatsApp with Message</a>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="pg-results" class="pg">
+      <div class="sec-hdr" style="background:linear-gradient(135deg,#4A1580,#6C3483)"><h2>📊 Examination Result Card</h2><p>Professional result card with grade table</p></div>
+      <div class="ui-card">
+        <div class="g3">
+          <div class="f"><label>Exam Title</label><input id="r-title" value="Final Term Examination"/></div>
+          <div class="f"><label>Year</label><input id="r-year" value="2026"/></div>
+          <div class="f"><label>Class Filter</label><select id="r-cls"></select></div>
+        </div>
+        <div style="font-weight:700;color:var(--primary);font-size:11px;margin:7px 0;text-transform:uppercase">📊 Enter Marks (Obtained / Out of)</div>
+        <div id="mk-grid" class="g4"></div>
+        <div class="g2" style="margin-top:10px">
+          <div class="f"><label>Principal Remarks</label><input id="r-rmk" placeholder="Excellent performance!"/></div>
+          <div class="f"><label>Next Term Starts</label><input id="r-nxt" placeholder="1 Feb 2026"/></div>
+        </div>
+      </div>
+      <input id="r-srch" style="width:100%;padding:9px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;outline:none;margin-bottom:10px;background:var(--white)" placeholder="🔍 Search student..." oninput="fS('r')"/>
+      <div id="r-stds" class="sgrid"></div>
+      <div id="r-out" class="out-box" style="display:none">
+        <div class="out-tabs">
+          <button class="out-tab on" onclick="swO('r','i',this)">🖼 Image Card</button>
+          <button class="out-tab" onclick="swO('r','m',this)">💬 WA Message</button>
+        </div>
+        <div id="r-iw"><div class="img-wrap"><img id="r-img"/></div></div>
+        <div id="r-mw" class="msg-box" style="display:none"></div>
+        <div class="save-hint" id="r-ht">🤖/🍎 Long-press → Save → WhatsApp ✅</div>
+        <a id="r-wa" href="#" target="_blank" class="btn-wa">📱 Open WhatsApp with Message</a>
+      </div>
+    </div>
+
+    <!-- FEES -->
+    <div id="pg-fees" class="pg">
+      <div class="sec-hdr" style="background:linear-gradient(135deg,#145A32,#1A7A4A)"><h2>💳 Fee Payment Slip</h2><p>Professional fee slip with school & parent copy</p></div>
+      <div class="ui-card">
+        <div class="g3">
+          <div class="f"><label>Month / Year</label><input id="f-month" placeholder="January 2026"/></div>
+          <div class="f"><label>Due Date</label><input id="f-due" placeholder="10 Jan 2026"/></div>
+          <div class="f"><label>Class Filter</label><select id="f-cls"></select></div>
+        </div>
+        <div style="font-weight:700;color:var(--primary);font-size:11px;margin:7px 0 6px;text-transform:uppercase">💰 Fee Items</div>
+        <div id="fee-rows"></div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:5px" onclick="addFR()">+ Add Item</button>
+        <div class="g2" style="margin-top:10px">
+          <div class="f"><label>Bank Account</label><input id="f-bank" placeholder="HBL 01234567890"/></div>
+          <div class="f"><label>JazzCash / EasyPaisa</label><input id="f-jazz" placeholder="0300-0000000"/></div>
+        </div>
+        <div class="f"><label>Note</label><input id="f-note" value="Please pay by due date to avoid late fee"/></div>
+      </div>
+      <input id="f-srch" style="width:100%;padding:9px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;outline:none;margin-bottom:10px;background:var(--white)" placeholder="🔍 Search student..." oninput="fS('f')"/>
+      <div id="f-stds" class="sgrid"></div>
+      <div id="f-out" class="out-box" style="display:none">
+        <div class="out-tabs">
+          <button class="out-tab on" onclick="swO('f','i',this)">🖼 Image Card</button>
+          <button class="out-tab" onclick="swO('f','m',this)">💬 WA Message</button>
+        </div>
+        <div id="f-iw"><div class="img-wrap"><img id="f-img"/></div></div>
+        <div id="f-mw" class="msg-box" style="display:none"></div>
+        <div class="save-hint" id="f-ht">🤖/🍎 Long-press → Save → WhatsApp ✅</div>
+        <a id="f-wa" href="#" target="_blank" class="btn-wa">📱 Open WhatsApp with Message</a>
+      </div>
+    </div>
+
+    <!-- DATE SHEET -->
+    <div id="pg-ds" class="pg">
+      <div class="sec-hdr" style="background:linear-gradient(135deg,#7D5A00,#B8960C)"><h2>📅 Examination Datesheet</h2><p>School-wide or personalised per student</p></div>
+      <div class="ui-card">
+        <div class="g2">
+          <div class="f"><label>Exam Title</label><input id="ds-t" value="Final Term Examination 2026"/></div>
+          <div class="f"><label>Timing</label><input id="ds-tm" value="7:30 AM – 11:30 AM"/></div>
+        </div>
+        <div class="f"><label>Instructions</label><input id="ds-note" placeholder="e.g. Bring school ID. Mobile phones not allowed."/></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 6px">
+          <div style="font-weight:700;color:var(--primary);font-size:11px;text-transform:uppercase">📋 Schedule</div>
+          <button class="btn btn-ghost btn-sm" onclick="addDR()">+ Row</button>
+        </div>
+        <div style="display:grid;grid-template-columns:0.8fr 0.9fr 1fr 0.9fr 1.2fr 26px;gap:4px;margin-bottom:4px;font-size:9px;font-weight:700;color:var(--text2)">
+          <span>DATE</span><span>DAY</span><span>SUBJECT</span><span>TIME</span><span>SYLLABUS</span><span></span>
+        </div>
+        <div id="ds-rows"></div>
+      </div>
+      <div class="g2" style="gap:10px">
+        <div>
+          <div style="font-weight:700;color:var(--primary);margin-bottom:8px;font-size:12px">📸 School-Wide Card</div>
+          <button class="btn btn-accent btn-full" onclick="genSchoolDS()">Generate School Date Sheet</button>
+          <div id="ds-school-out" style="display:none;margin-top:10px">
+            <div class="img-wrap"><img id="ds-school-img"/></div>
+            <div class="save-hint" style="margin-top:8px">Send to ALL parents broadcast list ✅</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-weight:700;color:var(--primary);margin-bottom:8px;font-size:12px">📸 Personalised per student</div>
+          <input id="s-srch" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:20px;font-size:12px;outline:none;background:var(--white);margin-bottom:8px" placeholder="🔍 Search..." oninput="fS('s')"/>
+          <div id="s-stds" class="sgrid"></div>
+        </div>
+      </div>
+      <div id="s-out" class="out-box" style="display:none">
+        <div class="out-tabs">
+          <button class="out-tab on" onclick="swO('s','i',this)">🖼 Image</button>
+          <button class="out-tab" onclick="swO('s','m',this)">💬 Message</button>
+        </div>
+        <div id="s-iw"><div class="img-wrap"><img id="s-img"/></div></div>
+        <div id="s-mw" class="msg-box" style="display:none"></div>
+        <div class="save-hint" id="s-ht">🤖/🍎 Long-press → Save → WhatsApp ✅</div>
+        <a id="s-wa" href="#" target="_blank" class="btn-wa">📱 Open WhatsApp with Message</a>
+      </div>
+    </div>
+
+    <!-- STUDENTS -->
+    <div id="pg-students" class="pg">
+      <div class="sec-hdr"><h2>👥 Students</h2><p id="std-count-lbl">Loading...</p></div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <input id="std-srch" style="flex:1;min-width:160px;padding:9px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;outline:none;background:var(--white)" placeholder="🔍 Search students..." oninput="searchStd()"/>
+        <button class="btn btn-green btn-sm" onclick="showAddStd()">+ Add Student</button>
+      </div>
+
+      <!-- Add/Edit Form -->
+      <div id="std-form" class="ui-card" style="display:none;border:2px solid var(--primary)">
+        <div style="font-weight:800;color:var(--primary);margin-bottom:12px;font-size:13px" id="std-form-t">ADD NEW STUDENT</div>
+        <div class="g2">
+          <div class="f"><label>Full Name *</label><input id="sf-nm" placeholder="Student full name"/></div>
+          <div class="f"><label>Roll No</label><input id="sf-rl" placeholder="001"/></div>
+          <div class="f"><label>Class</label>
+            <select id="sf-cl">
+              <option>Play Group</option><option>Nursery</option><option>Prep</option>
+              <option>Class 1</option><option>Class 2</option><option>Class 3</option>
+              <option selected>Class 4</option><option>Class 5</option><option>Class 6</option>
+              <option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option>
+            </select>
+          </div>
+          <div class="f"><label>Section</label><input id="sf-sec" placeholder="A"/></div>
+          <div class="f"><label>Monthly Fee (Rs.)</label><input id="sf-fe" type="number" value="1000"/></div>
+          <div class="f"><label>Father's Name</label><input id="sf-fn" placeholder="Mr..."/></div>
+          <div class="f"><label>Parent WhatsApp *</label><input id="sf-ph" placeholder="03001234567" type="tel"/></div>
+          <div class="f"><label>Parent Name</label><input id="sf-pr" placeholder="Mr./Mrs..."/></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-green" style="flex:1;padding:12px" onclick="saveStudent()">💾 Save Student</button>
+          <button class="btn btn-ghost btn-sm" onclick="cancelStdForm()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="std-tbl">
+        <div class="std-th"><span>#</span><span>Name</span><span>Class</span><span>Phone</span><span>Actions</span></div>
+        <div id="std-tbl-body"><div class="loader"><div class="spinner"></div>Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="pg-settings" class="pg">
+      <div class="sec-hdr"><h2>⚙️ Settings</h2><p>School branding, account, and plan</p></div>
+
+      <!-- Subscription Status -->
+      <div class="ui-card" style="background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:0.5px">Current Plan</div>
+            <div style="font-size:22px;font-weight:900;margin-top:2px" id="plan-name-big">TRIAL</div>
+            <div style="font-size:12px;opacity:0.7;margin-top:4px" id="plan-expiry">Expires: —</div>
+          </div>
+          <a id="upgrade-btn" href="#" target="_blank" class="btn" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--primary);padding:10px 18px">Upgrade Plan</a>
+        </div>
+      </div>
+
+      <!-- School Branding -->
+      <div class="ui-card">
+        <div style="font-weight:800;color:var(--primary);margin-bottom:12px;font-size:13px">🏫 School Branding</div>
+        <div class="g2">
+          <div class="f"><label>School Name (Big)</label><input id="b-nm1" value="SCHOOL NAME" oninput="lpv()"/></div>
+          <div class="f"><label>School Name (Small)</label><input id="b-nm2" value="EDUCATIONAL INSTITUTE" oninput="lpv()"/></div>
+          <div class="f"><label>Address</label><input id="b-addr" oninput="lpv()"/></div>
+          <div class="f"><label>Phone</label><input id="b-ph" oninput="lpv()"/></div>
+          <div class="f"><label>Email</label><input id="b-email" oninput="lpv()"/></div>
+          <div class="f"><label>Website</label><input id="b-web" oninput="lpv()"/></div>
+        </div>
+        <div class="g2">
+          <div class="f"><label>Primary Color</label>
+            <div style="display:flex;gap:7px;align-items:center">
+              <input type="color" id="b-pc" value="#0D1B4B" oninput="cS('pc');lpv()" style="width:42px;height:38px;padding:2px;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;flex-shrink:0"/>
+              <input id="b-pc-h" value="#0D1B4B" maxlength="7" oninput="hS('pc')" style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:12px"/>
+            </div>
+            <div class="sw-row">
+              <button class="sw" style="background:#0D1B4B" onclick="SC2('pc','#0D1B4B')"></button>
+              <button class="sw" style="background:#1A3A6B" onclick="SC2('pc','#1A3A6B')"></button>
+              <button class="sw" style="background:#C0392B" onclick="SC2('pc','#C0392B')"></button>
+              <button class="sw" style="background:#1A7A4A" onclick="SC2('pc','#1A7A4A')"></button>
+              <button class="sw" style="background:#6C3483" onclick="SC2('pc','#6C3483')"></button>
+              <button class="sw" style="background:#2C3E50" onclick="SC2('pc','#2C3E50')"></button>
+            </div>
+          </div>
+          <div class="f"><label>Accent Color</label>
+            <div style="display:flex;gap:7px;align-items:center">
+              <input type="color" id="b-ac" value="#B8960C" oninput="cS('ac');lpv()" style="width:42px;height:38px;padding:2px;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;flex-shrink:0"/>
+              <input id="b-ac-h" value="#B8960C" maxlength="7" oninput="hS('ac')" style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:12px"/>
+            </div>
+            <div class="sw-row">
+              <button class="sw" style="background:#B8960C" onclick="SC2('ac','#B8960C')"></button>
+              <button class="sw" style="background:#E67E22" onclick="SC2('ac','#E67E22')"></button>
+              <button class="sw" style="background:#2ECC71" onclick="SC2('ac','#2ECC71')"></button>
+              <button class="sw" style="background:#3498DB" onclick="SC2('ac','#3498DB')"></button>
+            </div>
+          </div>
+        </div>
+        <div style="margin:10px 0 7px;font-weight:700;color:var(--primary);font-size:11px;text-transform:uppercase">Live Preview:</div>
+        <div style="border-radius:10px;overflow:hidden;border:2px solid var(--border);overflow-x:auto"><img id="bpv" style="display:block;height:auto"/></div>
+        <button class="btn btn-green btn-full" style="margin-top:12px" onclick="saveBranding()">✅ Save Branding</button>
+      </div>
+
+      <!-- Account -->
+      <div class="ui-card">
+        <div style="font-weight:800;color:var(--primary);margin-bottom:12px;font-size:13px">👤 Account</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:12px" id="acct-email">Email: —</div>
+        <button class="btn btn-red btn-sm" onclick="doLogout()">Sign Out</button>
+      </div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div id="pg-admin" class="pg">
+      <div class="sec-hdr" style="background:linear-gradient(135deg,#7D5A00,#B8960C)"><h2>👑 Admin Panel</h2><p>Manage all schools and subscriptions</p></div>
+
+      <!-- Stats -->
+      <div class="stats-grid" id="admin-stats">
+        <div class="stat-card"><div class="num" id="stat-total">—</div><div class="lbl">Total Schools</div></div>
+        <div class="stat-card"><div class="num" id="stat-active">—</div><div class="lbl">Active</div></div>
+        <div class="stat-card"><div class="num" id="stat-trial">—</div><div class="lbl">Trial</div></div>
+        <div class="stat-card"><div class="num" id="stat-exp">—</div><div class="lbl">Expired</div></div>
+      </div>
+
+      <!-- Search -->
+      <input id="admin-srch" style="width:100%;padding:9px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;outline:none;margin-bottom:12px;background:var(--white)" placeholder="🔍 Search schools..." oninput="searchSchools()"/>
+
+      <!-- Schools list -->
+      <div id="admin-schools"><div class="loader"><div class="spinner"></div>Loading schools...</div></div>
+    </div>
+
+  </div><!-- /page-wrap -->
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <button class="nav-btn on" onclick="navTo('diary',this)"><span class="nav-icon">📝</span>Diary</button>
+    <button class="nav-btn" onclick="navTo('results',this)"><span class="nav-icon">📊</span>Results</button>
+    <button class="nav-btn" onclick="navTo('fees',this)"><span class="nav-icon">💳</span>Fees</button>
+    <button class="nav-btn" onclick="navTo('ds',this)"><span class="nav-icon">📅</span>Schedule</button>
+    <button class="nav-btn" onclick="navTo('students',this)"><span class="nav-icon">👥</span>Students</button>
+    <button class="nav-btn" onclick="navTo('settings',this)"><span class="nav-icon">⚙️</span>Settings</button>
+  </div>
+
+</div><!-- /app-screen -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Canvas for card drawing -->
+<canvas id="cv"></canvas>
+
+<script>
+// ════════════════════════════════════════════════════
+//  ⚙️  CONFIGURATION — EDIT THESE VALUES
+// ════════════════════════════════════════════════════
+var APP_CONFIG = {
+  // --- YOUR APP NAME & BRANDING ---
+  appName:    "SCHOOL APP",           // Change to your app name
+  tagline:    "Professional School Communication",
+  ownerName:  "Your Name",            // Your name shown in admin
+  supportWA:  "923009422517",         // Your WhatsApp for support (no + or 0)
+
+  // --- SUBSCRIPTION PLANS ---
+  plans: {
+    trial:    { name:"FREE TRIAL",  days:14,  price:0 },
+    manual:   { name:"MANUAL",      days:30,  price:2000 },
+    auto:     { name:"AUTO PRO",    days:30,  price:10000 },
+  },
+
+  // --- ADMIN CREDENTIALS (change these!) ---
+  adminEmail:    "admin@yourapp.com",   // Your admin email
+  adminPassword: "Admin@123456",        // Your admin password (change this!)
+
+  // --- FIREBASE CONFIG ---
+  // Step 1: Go to https://console.firebase.google.com
+  // Step 2: Create project → Add web app → Copy config below
+  firebase: {
+    apiKey:            "YOUR_API_KEY",
+    authDomain:        "YOUR_PROJECT.firebaseapp.com",
+    projectId:         "YOUR_PROJECT_ID",
+    storageBucket:     "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId:             "YOUR_APP_ID"
+  }
+};
+
+// ════════════════════════════════════════════════════
+//  FIREBASE INIT
+// ════════════════════════════════════════════════════
+var db, auth, currentUser, currentSchoolData, isAdmin = false;
+var STUDENTS = []; // in-memory cache
+
+try {
+  firebase.initializeApp(APP_CONFIG.firebase);
+  db   = firebase.firestore();
+  auth = firebase.getAuth ? firebase.getAuth() : firebase.auth();
+  // Enable offline persistence
+  db.enablePersistence().catch(function(){});
+} catch(e) {
+  console.warn("Firebase not configured:", e.message);
+}
+
+// ════════════════════════════════════════════════════
+//  APP STATE
+// ════════════════════════════════════════════════════
+var SC = {
+  nm1:"SCHOOL NAME", nm2:"EDUCATIONAL INSTITUTE",
+  addr:"", ph:"", email:"", web:"",
+  pc:"#0D1B4B", ac:"#B8960C"
+};
+var DSR = [
+  {date:"17-02-26",day:"Monday",sub:"English",time:"9:00 AM",syl:"Ch 1-4"},
+  {date:"19-02-26",day:"Wednesday",sub:"Mathematics",time:"9:00 AM",syl:"Units 1-6"},
+  {date:"21-02-26",day:"Friday",sub:"Science",time:"9:00 AM",syl:"Ch 1-5"},
+];
+var HWR = [{date:"",sub:"English",hw:"",init:""},{date:"",sub:"Urdu",hw:"",init:""},{date:"",sub:"Mathematics",hw:"",init:""}];
+var FeeRows = [{label:"Tuition Fee",amt:""},{label:"Exam Fee",amt:""},{label:"Activity Fee",amt:""}];
+var SUBS = ["English","Urdu","Mathematics","Science","Islamiyat","Social Studies","Computer","Nazra","Physics","Chemistry"];
+var editStudentId = null;
+
+// ════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════
+var CV = document.getElementById("cv");
+var CX = CV.getContext("2d");
+var SCALE = 2, CARD_W = 900;
+function G(id){return document.getElementById(id);}
+function td(){return new Date().toLocaleDateString("en-PK",{year:"numeric",month:"long",day:"numeric"});}
+function gr(p){return p>=90?"A+":p>=80?"A":p>=70?"B+":p>=60?"B":p>=50?"C":p>=40?"D":"F";}
+function gc(p){return p>=80?"#1A7A4A":p>=60?"#1A3A6B":p>=50?"#E67E22":"#C0392B";}
+function clsList(){return[...new Set(STUDENTS.map(function(s){return s.cl;}))].sort();}
+function waUrl(ph,msg){return"https://wa.me/92"+ph.replace(/^0/,"").replace(/\D/g,"")+"?text="+encodeURIComponent(msg);}
+function toast(msg){var t=G("toast");t.textContent=msg;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2500);}
+function nm(){var m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return m[new Date().getMonth()]+" "+new Date().getFullYear();}
+
+// Apply app config
+G("auth-app-name").textContent = APP_CONFIG.appName;
+G("auth-tagline").textContent  = APP_CONFIG.tagline;
+document.title                 = APP_CONFIG.appName;
+G("renew-wa").href = "https://wa.me/"+APP_CONFIG.supportWA+"?text=I+want+to+renew+my+subscription";
+G("upgrade-btn").href = "https://wa.me/"+APP_CONFIG.supportWA+"?text=I+want+to+upgrade+my+plan";
+
+// ════════════════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════════════════
+function switchAuthTab(tab, btn){
+  document.querySelectorAll(".auth-tab").forEach(function(b){b.classList.remove("on");});
+  btn.classList.add("on");
+  G("auth-login").style.display  = tab==="login"  ? "block":"none";
+  G("auth-signup").style.display = tab==="signup" ? "block":"none";
+  G("auth-err").style.display = "none";
+}
+
+function showAuthErr(msg){G("auth-err").textContent=msg;G("auth-err").style.display="block";}
+
+function doLogin(){
+  if(!auth){return showAuthErr("Firebase not configured. Add your Firebase config in APP_CONFIG.");}
+  var email = G("l-email").value.trim();
+  var pass  = G("l-pass").value.trim();
+  if(!email||!pass){return showAuthErr("Please enter email and password.");}
+  auth.signInWithEmailAndPassword(email, pass)
+    .then(function(result){
+      if(email===APP_CONFIG.adminEmail){isAdmin=true;loadAdminDashboard();}
+      else{isAdmin=false;loadSchoolData(result.user);}
+    })
+    .catch(function(e){showAuthErr(e.message);});
+}
+
+function doAdminLogin(){
+  G("l-email").value = APP_CONFIG.adminEmail;
+  G("l-pass").value  = APP_CONFIG.adminPassword;
+  doLogin();
+}
+
+function doSignup(){
+  if(!auth){return showAuthErr("Firebase not configured.");}
+  var sname = G("s-sname").value.trim();
+  var email = G("s-email").value.trim();
+  var pass  = G("s-pass").value.trim();
+  var city  = G("s-city").value.trim();
+  if(!sname||!email||!pass){return showAuthErr("All fields required.");}
+  if(pass.length<6){return showAuthErr("Password must be at least 6 characters.");}
+  auth.createUserWithEmailAndPassword(email, pass)
+    .then(function(result){
+      var uid = result.user.uid;
+      var trialEnd = new Date();
+      trialEnd.setDate(trialEnd.getDate() + APP_CONFIG.plans.trial.days);
+      return db.collection("schools").doc(uid).set({
+        name: sname, email: email, city: city,
+        plan: "trial", planExpiry: trialEnd.toISOString(),
+        createdAt: new Date().toISOString(),
+        branding: SC, studentCount: 0
+      });
+    })
+    .then(function(){
+      isAdmin=false;
+      loadSchoolData(auth.currentUser);
+    })
+    .catch(function(e){showAuthErr(e.message);});
+}
+
+function doLogout(){
+  if(auth)auth.signOut().then(function(){
+    G("auth-screen").style.display = "flex";
+    G("app-screen").style.display  = "none";
+    STUDENTS = [];
+  });
+}
+
+// ════════════════════════════════════════════════════
+//  LOAD SCHOOL DATA
+// ════════════════════════════════════════════════════
+function loadSchoolData(user){
+  currentUser = user;
+  db.collection("schools").doc(user.uid).get()
+    .then(function(doc){
+      if(doc.exists){
+        currentSchoolData = doc.data();
+        applySchoolData(currentSchoolData);
+        loadStudents(user.uid);
+        checkSubscription(currentSchoolData);
+      } else {
+        // New school — create default data
+        currentSchoolData = {name:"My School",plan:"trial",planExpiry:getTrialExpiry(),branding:SC};
+        db.collection("schools").doc(user.uid).set(currentSchoolData);
+        applySchoolData(currentSchoolData);
+        loadStudents(user.uid);
+      }
+      showApp();
+    })
+    .catch(function(e){
+      // Offline mode — load from cache
+      showApp();
+      loadStudentsLocal(user.uid);
+    });
+}
+
+function getTrialExpiry(){
+  var d=new Date();d.setDate(d.getDate()+14);return d.toISOString();
+}
+
+function applySchoolData(data){
+  if(data.branding){
+    Object.assign(SC,data.branding);
+    // Sync branding fields
+    var fields={nm1:SC.nm1,nm2:SC.nm2,addr:SC.addr||"",ph:SC.ph||"",email:SC.email||"",web:SC.web||""};
+    Object.keys(fields).forEach(function(k){if(G("b-"+k))G("b-"+k).value=fields[k];});
+    if(G("b-pc"))G("b-pc").value=SC.pc;if(G("b-pc-h"))G("b-pc-h").value=SC.pc;
+    if(G("b-ac"))G("b-ac").value=SC.ac;if(G("b-ac-h"))G("b-ac-h").value=SC.ac;
+  }
+  G("app-school-name").textContent = data.name || SC.nm1+" "+SC.nm2;
+  G("app-logo").textContent = (data.name||SC.nm1).substring(0,2).toUpperCase();
+  G("acct-email").textContent = "Email: "+(currentUser?currentUser.email:"");
+  var plan = data.plan||"trial";
+  var expiry = data.planExpiry?new Date(data.planExpiry).toLocaleDateString("en-PK",{day:"numeric",month:"short",year:"numeric"}):"—";
+  var planObj = APP_CONFIG.plans[plan]||APP_CONFIG.plans.trial;
+  G("plan-badge").textContent = planObj.name;
+  G("plan-name-big").textContent = planObj.name;
+  G("plan-expiry").textContent = "Expires: "+expiry;
+}
+
+function checkSubscription(data){
+  if(!data.planExpiry)return;
+  var expiry = new Date(data.planExpiry);
+  var now = new Date();
+  if(expiry<now){
+    G("plan-badge").textContent="EXPIRED";
+    G("plan-badge").className="plan-badge expired";
+    G("locked-overlay").style.display="flex";
+  }
+}
+
+function showApp(){
+  G("auth-screen").style.display="none";
+  G("app-screen").style.display="flex";
+  // Show admin nav if admin
+  if(isAdmin){
+    var adminBtn = document.createElement("button");
+    adminBtn.className="nav-btn";
+    adminBtn.innerHTML='<span class="nav-icon">👑</span>Admin';
+    adminBtn.onclick=function(){navTo("admin",this);};
+    document.querySelector(".bottom-nav").appendChild(adminBtn);
+  }
+  initAllForms();
+}
+
+// ════════════════════════════════════════════════════
+//  STUDENTS — FIRESTORE
+// ════════════════════════════════════════════════════
+function loadStudents(uid){
+  db.collection("schools").doc(uid).collection("students")
+    .orderBy("cl").orderBy("nm")
+    .onSnapshot(function(snap){
+      STUDENTS = [];
+      snap.forEach(function(doc){STUDENTS.push(Object.assign({id:doc.id},doc.data()));});
+      renderStdTable();
+      refreshAllClassDropdowns();
+      G("std-count-lbl").textContent = STUDENTS.length+" students registered";
+    });
+}
+
+function loadStudentsLocal(uid){
+  // Fallback: try cached Firestore
+  db.collection("schools").doc(uid).collection("students")
+    .get({source:"cache"})
+    .then(function(snap){
+      STUDENTS=[];
+      snap.forEach(function(doc){STUDENTS.push(Object.assign({id:doc.id},doc.data()));});
+      renderStdTable();refreshAllClassDropdowns();
+    }).catch(function(){});
+}
+
+function saveStudent(){
+  var nm=G("sf-nm").value.trim(),ph=G("sf-ph").value.trim();
+  if(!nm||!ph){toast("Name and phone required.");return;}
+  var obj={nm:nm,rl:G("sf-rl").value.trim(),cl:G("sf-cl").value,
+    sec:G("sf-sec").value.trim(),fe:Number(G("sf-fe").value)||1000,
+    fn:G("sf-fn").value.trim(),pr:G("sf-pr").value.trim(),ph:ph,
+    updatedAt:new Date().toISOString()};
+  var uid=currentUser.uid;
+  var ref=db.collection("schools").doc(uid).collection("students");
+  var promise = editStudentId ? ref.doc(editStudentId).update(obj) : ref.add(Object.assign(obj,{createdAt:new Date().toISOString()}));
+  promise.then(function(){
+    toast(editStudentId?"Student updated ✅":"Student added ✅");
+    cancelStdForm();
+    // Update student count
+    db.collection("schools").doc(uid).update({studentCount:firebase.firestore.FieldValue.increment(editStudentId?0:1)});
+  }).catch(function(e){toast("Error: "+e.message);});
+}
+
+function deleteStudent(id){
+  if(!confirm("Delete this student? This cannot be undone."))return;
+  var uid=currentUser.uid;
+  db.collection("schools").doc(uid).collection("students").doc(id).delete()
+    .then(function(){
+      toast("Student deleted");
+      db.collection("schools").doc(uid).update({studentCount:firebase.firestore.FieldValue.increment(-1)});
+    });
+}
+
+function editStudent(id){
+  var s=STUDENTS.find(function(x){return x.id===id;});if(!s)return;
+  editStudentId=id;
+  G("sf-nm").value=s.nm;G("sf-rl").value=s.rl||"";G("sf-cl").value=s.cl;
+  G("sf-sec").value=s.sec||"";G("sf-fe").value=s.fe||1000;
+  G("sf-fn").value=s.fn||"";G("sf-pr").value=s.pr||"";G("sf-ph").value=s.ph;
+  G("std-form-t").textContent="EDIT STUDENT";
+  G("std-form").style.display="block";
+  G("std-form").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+function showAddStd(){
+  editStudentId=null;
+  ["sf-nm","sf-rl","sf-sec","sf-fn","sf-ph","sf-pr"].forEach(function(id){G(id).value="";});
+  G("sf-fe").value="1000";G("sf-cl").value="Class 4";
+  G("std-form-t").textContent="ADD NEW STUDENT";
+  G("std-form").style.display="block";
+  G("std-form").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+function cancelStdForm(){editStudentId=null;G("std-form").style.display="none";}
+
+function renderStdTable(filtered){
+  var list=filtered||STUDENTS;
+  var c=G("std-tbl-body");c.innerHTML="";
+  if(!list.length){c.innerHTML='<div style="padding:24px;text-align:center;color:var(--text2);font-size:13px">No students found.</div>';return;}
+  list.forEach(function(s,i){
+    c.innerHTML+='<div class="std-tr" style="background:'+(i%2===0?"#F8FAFF":"#fff")+'">'+
+      '<span style="color:var(--text2);font-weight:700;font-size:10px">'+(s.rl||i+1)+'</span>'+
+      '<span><div style="font-weight:700;font-size:12px">'+s.nm+'</div><div style="font-size:10px;color:var(--text2)">'+s.fn+'  ·  '+s.ph+'</div></span>'+
+      '<span><span class="badge">'+s.cl+(s.sec?" "+s.sec:"")+'</span></span>'+
+      '<span style="font-size:11px;color:var(--green)">'+s.ph+'</span>'+
+      '<span style="display:flex;gap:4px">'+
+        '<button class="act-btn" style="background:#EBF5FF;color:var(--primary)" onclick="editStudent(\''+s.id+'\')">Edit</button>'+
+        '<button class="act-btn" style="background:#FDEDEC;color:var(--red)" onclick="deleteStudent(\''+s.id+'\')">Del</button>'+
+      '</span></div>';
+  });
+}
+
+function searchStd(){
+  var q=G("std-srch").value.toLowerCase();
+  renderStdTable(q?STUDENTS.filter(function(s){return s.nm.toLowerCase().includes(q)||s.rl.includes(q)||s.cl.toLowerCase().includes(q);}):null);
+}
+
+// ════════════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════════════
+function navTo(id,btn){
+  document.querySelectorAll(".pg").forEach(function(p){p.classList.remove("on");});
+  document.querySelectorAll(".nav-btn").forEach(function(b){b.classList.remove("on");});
+  G("pg-"+id).classList.add("on");
+  if(btn)btn.classList.add("on");
+  // Init pages
+  if(id==="diary")initDiary();
+  if(id==="results")initResults();
+  if(id==="fees")initFees();
+  if(id==="ds")initDS();
+  if(id==="students"){}// already live via onSnapshot
+  if(id==="settings")lpv();
+  if(id==="admin")loadAdminPanel();
+}
+
+function refreshAllClassDropdowns(){
+  var classes=clsList();
+  ["d-cls","r-cls","f-cls"].forEach(function(id){
+    var el=G(id);if(!el)return;
+    var cur=el.value;el.innerHTML='<option value="">All Classes</option>';
+    classes.forEach(function(c){var o=document.createElement("option");o.value=c;o.text=c;el.add(o);});
+    if(cur)el.value=cur;
+  });
+}
+
+// ════════════════════════════════════════════════════
+//  FORM HELPERS
+// ════════════════════════════════════════════════════
+function initAllForms(){
+  G("d-date").value=td();
+  var rm=G("r-cls");if(rm){}
+  initFees();initDS();renderHW();renderMkGrid();
+}
+
+function fS(pre){
+  var srchId=pre===("s")?"s-srch":pre+"-srch";
+  var q=(G(srchId)||{value:""}).value.toLowerCase();
+  var f=q?STUDENTS.filter(function(s){return s.nm.toLowerCase().includes(q)||s.rl.includes(q)||s.cl.toLowerCase().includes(q);}):STUDENTS;
+  var cid=pre==="s"?"s-stds":pre+"-stds";
+  var c=G(cid);if(!c)return;c.innerHTML="";
+  f.forEach(function(s){
+    c.innerHTML+='<button class="sbtn" onclick="genCard(\''+pre+'\',\''+s.id+'\')" >'+
+      '<div class="sn">'+s.nm+'</div>'+
+      '<div class="sd">'+s.cl+(s.sec?" "+s.sec:"")+" · "+s.rl+'</div>'+
+    '</button>';
+  });
+  if(!f.length)c.innerHTML='<div style="padding:10px;color:var(--text2);font-size:12px;background:var(--white);border-radius:8px">No students found.</div>';
+}
+
+function genCard(pre,sid){
+  if(pre==="d")genD(sid);else if(pre==="r")genR(sid);
+  else if(pre==="f")genF(sid);else if(pre==="s")genDSstu(sid);
+}
+
+function swO(pre,type,btn){
+  var pg=document.querySelector(".pg.on");
+  if(pg)pg.querySelectorAll(".out-tab").forEach(function(b){b.classList.remove("on");});
+  btn.classList.add("on");
+  var iw=G(pre+"-iw"),mw=G(pre+"-mw"),ht=G(pre+"-ht"),wa=G(pre+"-wa");
+  if(type==="i"){if(iw)iw.style.display="block";if(mw)mw.style.display="none";if(ht)ht.style.display="block";if(wa)wa.style.display="none";}
+  else{if(iw)iw.style.display="none";if(mw)mw.style.display="block";if(ht)ht.style.display="none";if(wa)wa.style.display="block";}
+}
+
+function initDiary(){G("d-date").value=G("d-date").value||td();renderHW();fS("d");}
+function initResults(){renderMkGrid();fS("r");}
+function initFees(){var fm=G("f-month");if(fm&&!fm.value)fm.value=nm();renderFeeRows();fS("f");}
+function initDS(){renderDSRows();fS("s");}
+
+function renderHW(){
+  var tb=G("hw-tbody");tb.innerHTML="";
+  HWR.forEach(function(r,i){tb.innerHTML+='<tr><td><input value="'+r.date+'" oninput="HWR['+i+'].date=this.value" placeholder="Date"/></td><td><input value="'+r.sub+'" oninput="HWR['+i+'].sub=this.value" placeholder="Subject"/></td><td><input value="'+r.hw+'" oninput="HWR['+i+'].hw=this.value" placeholder="Homework description"/></td><td><input value="'+r.init+'" oninput="HWR['+i+'].init=this.value" placeholder="T.I."/></td></tr>';});
+}
+function addHW(){HWR.push({date:"",sub:"",hw:"",init:""});renderHW();}
+
+function renderMkGrid(){
+  var mg=G("mk-grid");mg.innerHTML="";
+  SUBS.forEach(function(sub){mg.innerHTML+='<div class="mk-box"><div class="sn">'+sub+'</div><div style="display:flex;gap:3px;align-items:center"><input type="number" id="mk-'+sub.replace(/ /g,"_")+'" placeholder="Marks" min="0" style="width:44px;padding:4px;font-size:11px;border:1px solid var(--border);border-radius:4px;text-align:center"/><span style="font-size:9px;color:var(--text2)">/</span><input type="number" id="mo-'+sub.replace(/ /g,"_")+'" value="100" style="width:44px;padding:4px;font-size:11px;border:1px solid var(--border);border-radius:4px;text-align:center"/></div></div>';});
+}
+
+function renderFeeRows(){
+  var c=G("fee-rows");c.innerHTML="";
+  FeeRows.forEach(function(r,i){c.innerHTML+='<div class="fee-row"><input value="'+r.label+'" oninput="FeeRows['+i+'].label=this.value" placeholder="Fee item" style="flex:2"/><input type="number" class="fee-amt" value="'+r.amt+'" oninput="FeeRows['+i+'].amt=this.value" placeholder="Rs."/><button class="fee-del" onclick="delFR('+i+')">×</button></div>';});
+}
+function addFR(){FeeRows.push({label:"",amt:""});renderFeeRows();}
+function delFR(i){FeeRows.splice(i,1);renderFeeRows();}
+
+function renderDSRows(){
+  var c=G("ds-rows");c.innerHTML="";
+  DSR.forEach(function(r,i){c.innerHTML+='<div class="sr"><input value="'+r.date+'" oninput="DSR['+i+'].date=this.value" placeholder="17-02-26"/><input value="'+r.day+'" oninput="DSR['+i+'].day=this.value" placeholder="Monday"/><input value="'+r.sub+'" oninput="DSR['+i+'].sub=this.value" placeholder="English"/><input value="'+r.time+'" oninput="DSR['+i+'].time=this.value" placeholder="9:00 AM"/><input value="'+r.syl+'" oninput="DSR['+i+'].syl=this.value" placeholder="Ch 1-4"/><button class="db" onclick="delDR('+i+')">×</button></div>';});
+}
+function addDR(){DSR.push({date:"",day:"",sub:"",time:"",syl:""});renderDSRows();}
+function delDR(i){DSR.splice(i,1);renderDSRows();}
+
+// ════════════════════════════════════════════════════
+//  CANVAS DRAWING — 2x SHARP
+// ════════════════════════════════════════════════════
+function beginCard(lW,lH){CV.width=lW*SCALE;CV.height=lH*SCALE;CX.setTransform(1,0,0,1,0,0);CX.scale(SCALE,SCALE);}
+function endCard(imgId,lW){var img=G(imgId);img.src=CV.toDataURL("image/png",1.0);img.style.width=lW+"px";img.style.height="auto";}
+
+function rr(x,y,w,h,r,fill,sc,sw){
+  CX.beginPath();CX.moveTo(x+r,y);CX.lineTo(x+w-r,y);CX.arcTo(x+w,y,x+w,y+r,r);CX.lineTo(x+w,y+h-r);CX.arcTo(x+w,y+h,x+w-r,y+h,r);CX.lineTo(x+r,y+h);CX.arcTo(x,y+h,x,y+h-r,r);CX.lineTo(x,y+r);CX.arcTo(x,y,x+r,y,r);CX.closePath();
+  if(fill){CX.fillStyle=fill;CX.fill();}if(sc){CX.strokeStyle=sc;CX.lineWidth=sw||1;CX.stroke();}
+}
+function mg(x,y,h){var g=CX.createLinearGradient(x,y,x,y+h);g.addColorStop(0,"#ECEEF3");g.addColorStop(0.35,"#D5D8E2");g.addColorStop(0.5,"#C5C8D2");g.addColorStop(0.65,"#D5D8E2");g.addColorStop(1,"#B5B8C2");return g;}
+
+function drawHdr(W){
+  var H=105;CX.fillStyle=mg(0,0,H);CX.fillRect(0,0,W,H);
+  rr(3,3,W-6,H-6,2,null,SC.pc,2.5);rr(7,7,W-14,H-14,2,null,SC.pc+"33",0.8);
+  CX.fillStyle=SC.pc;CX.font="bold 46px Arial";CX.textAlign="center";CX.fillText(SC.nm1,W/2,64);
+  CX.font="13px Arial";CX.fillStyle=SC.pc+"cc";CX.fillText(SC.nm2.split("").join("  "),W/2,88);
+  CX.textAlign="left";return H;
+}
+function drawTitle(y,W,main,sub){
+  CX.fillStyle=mg(4,y,48);CX.fillRect(4,y,W-8,48);rr(4,y,W-8,48,0,null,SC.pc,1.5);
+  CX.textAlign="center";CX.fillStyle=SC.pc;CX.font="bold 16px Arial";CX.fillText(main,W/2,y+20);
+  if(sub){CX.font="12px Arial";CX.fillStyle=SC.pc+"99";CX.fillText(sub,W/2,y+38);}
+  CX.textAlign="left";return y+48;
+}
+function drawTH(y,W,cols){
+  CX.fillStyle=SC.pc;CX.fillRect(4,y,W-8,28);CX.fillStyle="#fff";CX.font="bold 11px Arial";CX.textAlign="center";
+  var x=4;cols.forEach(function(c){CX.fillText(c[0],x+c[1]/2,y+19);x+=c[1];});CX.textAlign="left";return y+28;
+}
+function drawTR(y,W,cols,vals,even){
+  CX.fillStyle=even?"rgba(255,255,255,0.9)":"rgba(213,216,226,0.6)";CX.fillRect(4,y,W-8,30);
+  var x=4;CX.strokeStyle=SC.pc+"30";CX.lineWidth=0.5;
+  cols.forEach(function(c,i){
+    if(i>0){CX.beginPath();CX.moveTo(x,y);CX.lineTo(x,y+30);CX.stroke();}
+    CX.fillStyle=i===0?"#111":"#333";CX.font=i===0?"bold 12px Arial":"12px Arial";
+    CX.textAlign="center";if(vals[i]!==undefined)CX.fillText(String(vals[i]),x+c[1]/2,y+20);x+=c[1];
+  });
+  CX.strokeStyle=SC.pc+"30";CX.lineWidth=0.5;CX.strokeRect(4,y,W-8,30);CX.textAlign="left";return y+30;
+}
+function drawFtr(W,H){
+  CX.fillStyle=SC.pc;CX.fillRect(4,H-30,W-8,26);rr(4,H-30,W-8,26,0,null,SC.pc,1);
+  CX.fillStyle="#fff";CX.font="10px Arial";CX.textAlign="center";
+  CX.fillText("Contact: "+SC.ph+(SC.email?"  |  "+SC.email:"")+(SC.web?"  |  "+SC.web:""),W/2,H-12);CX.textAlign="left";
+}
+
+// ════════════════════════════════════════════════════
+//  DIARY CARD
+// ════════════════════════════════════════════════════
+function genD(sid){
+  var s=STUDENTS.find(function(x){return x.id===sid;});if(!s)return;
+  var hw=HWR.filter(function(r){return r.sub||r.hw;});
+  var rmk=G("d-rmk").value,nxt=G("d-nxt").value,date=G("d-date").value;
+  var W=CARD_W,rH=30,rows=Math.max(hw.length,5);
+  var H=105+48+46+28+(rows*rH)+(rmk?42:0)+8+30+10;
+  beginCard(W,H);CX.fillStyle=mg(0,0,H);CX.fillRect(0,0,W,H);rr(2,2,W-4,H-4,2,null,SC.pc,2);
+  var y=drawHdr(W);y=drawTitle(y,W,"DAILY WORK & REMARKS","");
+  CX.fillStyle=mg(4,y,44);CX.fillRect(4,y,W-8,44);rr(4,y,W-8,44,0,null,SC.pc,1.5);
+  CX.fillStyle=SC.pc;CX.font="bold 13px Arial";CX.fillText("STUDENT: "+s.nm,14,y+16);
+  CX.fillText("CLASS: "+s.cl+(s.sec?" | SEC: "+s.sec:"")+" | ROLL: "+s.rl,14,y+34);
+  CX.fillStyle="#555";CX.font="11px Arial";CX.textAlign="right";CX.fillText("DATE: "+date,W-12,y+16);CX.textAlign="left";y+=44;
+  var cols=[[" DATE",108],[" SUBJECT",138],[" HOMEWORK / CLASSWORK",W-8-108-138-108],[" TEACHER INITIALS",108]];
+  y=drawTH(y,W,cols);
+  for(var i=0;i<rows;i++){var r=i<hw.length?hw[i]:{date:"",sub:"",hw:"",init:""};y=drawTR(y,W,cols,[r.date,r.sub,r.hw,r.init],i%2===0);}
+  if(rmk){CX.fillStyle=mg(4,y,38);CX.fillRect(4,y,W-8,38);rr(4,y,W-8,38,0,null,SC.pc,1);CX.fillStyle=SC.pc;CX.font="11px Arial";CX.fillText("  REMARKS: "+rmk,10,y+15);if(nxt)CX.fillText("  NEXT: "+nxt,10,y+31);y+=40;}
+  y+=6;drawFtr(W,H);endCard("d-img",W);
+  var msg="*📝 "+SC.nm1+" — Daily Work*\n"+date+"\n\n*"+s.nm+"*  |  "+s.cl+" · Roll: "+s.rl+"\n\n*Homework:*\n";
+  hw.forEach(function(r){if(r.hw)msg+="▸ *"+r.sub+":* "+r.hw+"\n";});
+  if(rmk)msg+="\n📌 "+rmk;msg+="\n\n_"+SC.nm1+"  ·  "+SC.ph+"_";
+  G("d-mw").textContent=msg;G("d-wa").href=waUrl(s.ph,msg);
+  G("d-out").style.display="block";setTimeout(function(){G("d-out").scrollIntoView({behavior:"smooth",block:"nearest"});},150);
+}
+
+// ════════════════════════════════════════════════════
+//  RESULT CARD
+// ════════════════════════════════════════════════════
+function genR(sid){
+  var s=STUDENTS.find(function(x){return x.id===sid;});if(!s)return;
+  var mks=SUBS.map(function(sub){var o=G("mk-"+sub.replace(/ /g,"_")),m=G("mo-"+sub.replace(/ /g,"_"));return{sub:sub,ob:o?o.value.trim():"",of:m?m.value.trim():"100"};}).filter(function(m){return m.ob!=="";});
+  var title=G("r-title").value,year=G("r-year").value,rmk=G("r-rmk").value;
+  var tot=mks.reduce(function(a,m){return a+Number(m.ob);},0),max=mks.reduce(function(a,m){return a+Number(m.of||100);},0);
+  var pct=max?Math.round(tot/max*100):0,grade=gr(pct),gcol=gc(pct);
+  var W=CARD_W;
+  var H=105+48+58+28+(mks.length*30)+52+(rmk?36:0)+10+30+10;
+  beginCard(W,H);CX.fillStyle=mg(0,0,H);CX.fillRect(0,0,W,H);rr(2,2,W-4,H-4,2,null,SC.pc,2);
+  var y=drawHdr(W);y=drawTitle(y,W,"TERM EXAMINATION RESULT CARD",title+" — "+year);
+  CX.fillStyle=mg(4,y,56);CX.fillRect(4,y,W-8,56);rr(4,y,W-8,56,0,null,SC.pc,1.5);
+  var c3=(W-8)/3;CX.textAlign="center";CX.fillStyle="#777";CX.font="bold 9px Arial";
+  CX.fillText("STUDENT NAME",4+c3/2,y+15);CX.fillText("ROLL NO.",4+c3+c3/2,y+15);CX.fillText("CLASS",4+c3*2+c3/2,y+15);
+  CX.fillStyle=SC.pc;CX.font="bold 15px Arial";
+  CX.fillText(s.nm,4+c3/2,y+40);CX.fillText(s.rl||"—",4+c3+c3/2,y+40);CX.fillText(s.cl+(s.sec?" "+s.sec:""),4+c3*2+c3/2,y+40);
+  [c3,c3*2].forEach(function(dx){CX.beginPath();CX.moveTo(4+dx,y+8);CX.lineTo(4+dx,y+48);CX.strokeStyle=SC.pc+"55";CX.lineWidth=1;CX.stroke();});
+  CX.textAlign="left";y+=56;
+  var cols=[[" SUBJECT",218],[" MAX",116],[" OBTAINED",120],[" PERCENT",116],[" GRADE",84],[" REMARKS",W-8-218-116-120-116-84]];
+  y=drawTH(y,W,cols);
+  mks.forEach(function(m,i){var ep=Math.round(Number(m.ob)/Number(m.of||100)*100);y=drawTR(y,W,cols,[m.sub,m.of||"100",m.ob,ep+"%",gr(ep),""],i%2===0);});
+  CX.fillStyle=SC.pc;CX.fillRect(4,y,W-8,50);rr(4,y,W-8,50,0,null,SC.pc,1);
+  CX.fillStyle="#fff";CX.font="bold 13px Arial";CX.textAlign="center";
+  CX.fillText("GRAND TOTAL",4+218/2,y+18);CX.fillText(String(max),4+218+116/2,y+18);CX.fillText(String(tot),4+218+116+120/2,y+18);CX.fillText(pct+"%",4+218+116+120+116/2,y+18);
+  CX.fillStyle=SC.ac;CX.font="bold 20px Arial";CX.fillText(grade,4+218+116+120+116+84/2,y+24);
+  CX.fillStyle="#fff";CX.font="bold 12px Arial";CX.fillText("FINAL GRADE",4+218+116+120+116+84,y+38);
+  CX.fillStyle=SC.ac;CX.font="bold 18px Arial";CX.fillText(grade,4+W-8-80,y+46);CX.textAlign="left";y+=52;
+  if(rmk){CX.fillStyle=mg(4,y,30);CX.fillRect(4,y,W-8,30);rr(4,y,W-8,30,0,null,SC.pc,1);CX.fillStyle=SC.pc;CX.font="11px Arial";CX.textAlign="center";CX.fillText("Remarks: "+rmk,W/2,y+20);CX.textAlign="left";y+=32;}
+  y+=8;drawFtr(W,H);endCard("r-img",W);
+  var msg="*📊 "+SC.nm1+" — "+title+" "+year+"*\n\n*"+s.nm+"*  |  "+s.cl+" | Roll: "+s.rl+"\n\n";
+  mks.forEach(function(m){var ep=Math.round(Number(m.ob)/Number(m.of||100)*100);msg+="▸ *"+m.sub+":* "+m.ob+"/"+m.of+" — "+ep+"% ("+gr(ep)+")\n";});
+  msg+="\n*Total: "+tot+"/"+max+"  |  "+pct+"%  |  Grade: "+grade+"*\n\n_"+SC.nm1+"  ·  "+SC.ph+"_";
+  G("r-mw").textContent=msg;G("r-wa").href=waUrl(s.ph,msg);
+  G("r-out").style.display="block";setTimeout(function(){G("r-out").scrollIntoView({behavior:"smooth",block:"nearest"});},150);
+}
+
+// ════════════════════════════════════════════════════
+//  FEE CARD
+// ════════════════════════════════════════════════════
+function genF(sid){
+  var s=STUDENTS.find(function(x){return x.id===sid;});if(!s)return;
+  var month=G("f-month").value,due=G("f-due").value,bank=G("f-bank").value,jazz=G("f-jazz").value,note=G("f-note").value;
+  var items=FeeRows.filter(function(r){return r.label;});
+  var total=items.reduce(function(a,r){return a+Number(r.amt||0);},0);
+  var W=CARD_W,rH=28,H=105+48+56+28+(items.length*rH)+36+62+58+60+60;
+  beginCard(W,H);CX.fillStyle=mg(0,0,H);CX.fillRect(0,0,W,H);rr(2,2,W-4,H-4,2,null,SC.pc,2);
+  var y=drawHdr(W);y=drawTitle(y,W,"FEE PAYMENT SLIP — ["+month.toUpperCase()+"]","");
+  var half=(W-8)/2,lx=4,rx=4+half,ly=y,ry=y;
+  // Left
+  CX.fillStyle=SC.pc;CX.fillRect(lx,ly,half,26);CX.fillStyle="#fff";CX.font="bold 10px Arial";CX.fillText("  STUDENT INFO",lx+4,ly+17);ly+=26;
+  CX.fillStyle=mg(lx,ly,54);CX.fillRect(lx,ly,half,54);rr(lx,ly,half,54,0,null,SC.pc,0.5);
+  CX.fillStyle="#222";CX.font="12px Arial";CX.fillText("  "+s.nm,lx,ly+16);CX.fillText("  "+s.cl+(s.sec?" / "+s.sec:"")+"  ID: "+s.rl,lx,ly+32);CX.fillText("  Father: "+s.fn,lx,ly+48);ly+=54;
+  CX.fillStyle=SC.pc;CX.fillRect(lx,ly,half,26);CX.fillStyle="#fff";CX.font="bold 10px Arial";CX.fillText("  FEE DETAILS",lx+4,ly+17);ly+=26;
+  items.forEach(function(r,i){
+    CX.fillStyle=i%2===0?"rgba(255,255,255,0.9)":"rgba(213,216,226,0.5)";CX.fillRect(lx,ly,half,rH);rr(lx,ly,half,rH,0,null,SC.pc+"33",0.5);
+    CX.fillStyle="#222";CX.font="12px Arial";CX.fillText("  "+r.label,lx,ly+19);CX.textAlign="right";CX.fillText("Rs. "+(r.amt||"—"),lx+half-8,ly+19);CX.textAlign="left";ly+=rH;
+  });
+  CX.fillStyle=SC.pc;CX.fillRect(lx,ly,half,34);rr(lx,ly,half,34,0,null,SC.pc,1);
+  CX.fillStyle="#fff";CX.font="bold 13px Arial";CX.fillText("  TOTAL",lx,ly+22);CX.fillStyle=SC.ac;CX.font="bold 16px Arial";CX.textAlign="right";CX.fillText("Rs. "+total,lx+half-8,ly+24);CX.textAlign="left";ly+=34;
+  // Right
+  CX.fillStyle=SC.pc;CX.fillRect(rx,ry,half,26);CX.fillStyle="#fff";CX.font="bold 10px Arial";CX.fillText("  DUE DATE",rx+4,ry+17);ry+=26;
+  CX.fillStyle=mg(rx,ry,36);CX.fillRect(rx,ry,half,36);rr(rx,ry,half,36,0,null,SC.pc,0.5);CX.fillStyle=SC.pc;CX.font="bold 16px Arial";CX.fillText("  "+due,rx,ry+25);ry+=36;
+  CX.fillStyle=SC.pc;CX.fillRect(rx,ry,half,26);CX.fillStyle="#fff";CX.font="bold 10px Arial";CX.fillText("  TOTAL PAYABLE",rx+4,ry+17);ry+=26;
+  CX.fillStyle=mg(rx,ry,66);CX.fillRect(rx,ry,half,66);rr(rx,ry,half,66,0,null,SC.pc,0.5);
+  CX.fillStyle=SC.ac;CX.font="bold 22px Arial";CX.fillText("  Rs. "+total,rx,ry+48);ry+=66;
+  CX.fillStyle=SC.pc;CX.fillRect(rx,ry,half,26);CX.fillStyle="#fff";CX.font="bold 10px Arial";CX.fillText("  PAYMENT METHODS",rx+4,ry+17);ry+=26;
+  CX.fillStyle=mg(rx,ry,56);CX.fillRect(rx,ry,half,56);rr(rx,ry,half,56,0,null,SC.pc,0.5);
+  CX.fillStyle="#333";CX.font="11px Arial";CX.fillText("  🏦 "+bank,rx,ry+19);CX.fillText("  📱 "+jazz,rx,ry+40);ry+=56;
+  CX.beginPath();CX.moveTo(4+half,y);CX.lineTo(4+half,Math.max(ly,ry));CX.strokeStyle=SC.pc+"66";CX.lineWidth=1;CX.stroke();
+  var cy=Math.max(ly,ry)+10;
+  CX.setLineDash([6,4]);CX.strokeStyle=SC.pc+"88";CX.lineWidth=1;CX.beginPath();CX.moveTo(4,cy);CX.lineTo(W-4,cy);CX.stroke();CX.setLineDash([]);
+  CX.fillStyle=SC.pc;CX.font="bold 10px Arial";CX.textAlign="center";CX.fillText("SCHOOL COPY",W/4,cy+14);CX.fillText("PARENT COPY",(W*3)/4,cy+14);
+  CX.fillStyle="#555";CX.font="10px Arial";CX.fillText(s.nm,W/4,cy+28);CX.fillText(s.nm,(W*3)/4,cy+28);CX.textAlign="left";
+  drawFtr(W,H);endCard("f-img",W);
+  var msg="*💳 "+SC.nm1+" — Fee Slip*\n*"+month+"*\n\n*"+s.nm+"*  |  "+s.cl+" | Roll: "+s.rl+"\n\n";
+  items.forEach(function(r){msg+="▸ "+r.label+": Rs. "+r.amt+"\n";});
+  msg+="*Total: Rs. "+total+"*  |  Due: "+due+"\n\n📱 "+jazz+"\n🏦 "+bank;
+  if(note)msg+="\n📌 "+note;msg+="\n\n_"+SC.nm1+"  ·  "+SC.ph+"_";
+  G("f-mw").textContent=msg;G("f-wa").href=waUrl(s.ph,msg);
+  G("f-out").style.display="block";setTimeout(function(){G("f-out").scrollIntoView({behavior:"smooth",block:"nearest"});},150);
+}
+
+// ════════════════════════════════════════════════════
+//  DATE SHEET CARD
+// ════════════════════════════════════════════════════
+function buildDS(stuNm,cls,roll,show){
+  var rows=DSR.filter(function(r){return r.sub.trim();}),title=G("ds-t").value,timing=G("ds-tm").value,note=G("ds-note").value;
+  var W=CARD_W;
+  var H=105+48+(show?44:0)+28+(rows.length*30)+(note?36:0)+12+30+10;
+  beginCard(W,H);CX.fillStyle=mg(0,0,H);CX.fillRect(0,0,W,H);rr(2,2,W-4,H-4,2,null,SC.pc,2);
+  var y=drawHdr(W);y=drawTitle(y,W,"EXAMINATION DATESHEET",title+"     🕐 "+timing);
+  if(show){CX.fillStyle=mg(4,y,42);CX.fillRect(4,y,W-8,42);rr(4,y,W-8,42,0,null,SC.pc,1.5);CX.fillStyle=SC.pc;CX.font="bold 13px Arial";CX.fillText("STUDENT: "+stuNm,14,y+16);CX.fillText("CLASS: "+cls+" | ROLL: "+roll,14,y+34);y+=42;}
+  var cols=[[" DATE",110],[" DAY",110],[" SUBJECT",200],[" TIME",120],[" SYLLABUS COVERED (OPTIONAL)",W-8-110-110-200-120]];
+  y=drawTH(y,W,cols);
+  rows.forEach(function(r,i){y=drawTR(y,W,cols,[r.date,r.day,r.sub,r.time,r.syl],i%2===0);});
+  if(note){CX.fillStyle=mg(4,y,32);CX.fillRect(4,y,W-8,32);rr(4,y,W-8,32,0,null,SC.pc,1);CX.fillStyle=SC.pc;CX.font="italic 11px Arial";CX.textAlign="center";CX.fillText("📌 "+note,W/2,y+21);CX.textAlign="left";y+=34;}
+  y+=10;drawFtr(W,H);return W;
+}
+function genSchoolDS(){var W=buildDS("","","",false);G("ds-school-img").src=CV.toDataURL("image/png",1.0);G("ds-school-img").style.width=W+"px";G("ds-school-out").style.display="block";setTimeout(function(){G("ds-school-out").scrollIntoView({behavior:"smooth",block:"nearest"});},150);}
+function genDSstu(sid){
+  var s=STUDENTS.find(function(x){return x.id===sid;});if(!s)return;
+  var W=buildDS(s.nm,s.cl+(s.sec?" "+s.sec:""),s.rl,true);endCard("s-img",W);
+  var rows=DSR.filter(function(r){return r.sub.trim();});
+  var msg="*📅 "+SC.nm1+" — Exam Date Sheet*\n*"+G("ds-t").value+"*\n⏰ "+G("ds-tm").value+"\n\n*"+s.nm+"*  |  "+s.cl+" | Roll: "+s.rl+"\n\n";
+  rows.forEach(function(r){msg+="▸ *"+r.date+" "+r.day+":* "+r.sub+(r.time?" @ "+r.time:"")+(r.syl?" — "+r.syl:"")+"\n";});
+  if(G("ds-note").value)msg+="\n📌 "+G("ds-note").value;
+  msg+="\n\n_"+SC.nm1+"  ·  "+SC.ph+"_";
+  G("s-mw").textContent=msg;G("s-wa").href=waUrl(s.ph,msg);
+  G("s-out").style.display="block";setTimeout(function(){G("s-out").scrollIntoView({behavior:"smooth",block:"nearest"});},150);
+}
+
+// ════════════════════════════════════════════════════
+//  BRANDING
+// ════════════════════════════════════════════════════
+function cS(id){G("b-"+id+"-h").value=G("b-"+id).value;}
+function hS(id){var v=G("b-"+id+"-h").value;if(/^#[0-9A-Fa-f]{6}$/.test(v))G("b-"+id).value=v;lpv();}
+function SC2(id,v){G("b-"+id).value=v;G("b-"+id+"-h").value=v;lpv();}
+function curBrand(){return{nm1:G("b-nm1").value,nm2:G("b-nm2").value,addr:G("b-addr").value,ph:G("b-ph").value,email:G("b-email").value,web:G("b-web").value,pc:G("b-pc").value,ac:G("b-ac").value};}
+function lpv(){
+  var tmp=curBrand(),saved=JSON.parse(JSON.stringify(SC));Object.assign(SC,tmp);
+  G("b-pc-h").value=tmp.pc;G("b-ac-h").value=tmp.ac;
+  beginCard(CARD_W,110);CX.fillStyle=mg(0,0,110);CX.fillRect(0,0,CARD_W,110);rr(2,2,CARD_W-4,106,2,null,SC.pc,2);drawHdr(CARD_W);
+  G("bpv").src=CV.toDataURL("image/png",1.0);G("bpv").style.width=CARD_W+"px";
+  Object.assign(SC,saved);
+}
+function saveBranding(){
+  var brand=curBrand();Object.assign(SC,brand);
+  if(currentUser){
+    db.collection("schools").doc(currentUser.uid).update({branding:brand,name:brand.nm1+" "+brand.nm2})
+      .then(function(){
+        toast("Branding saved ✅");
+        G("app-school-name").textContent=brand.nm1+" "+brand.nm2;
+        G("app-logo").textContent=brand.nm1.substring(0,2).toUpperCase();
+      });
+  }
+}
+
+// ════════════════════════════════════════════════════
+//  ADMIN PANEL
+// ════════════════════════════════════════════════════
+function loadAdminDashboard(){
+  // Show admin nav item if not already there
+  showApp();
+  // Switch to admin page after load
+  setTimeout(function(){
+    var adminNav=document.querySelector(".nav-btn:last-child");
+    if(adminNav)navTo("admin",adminNav);
+  },500);
+}
+
+function loadAdminPanel(){
+  db.collection("schools").get().then(function(snap){
+    var schools=[],active=0,trial=0,exp=0;
+    snap.forEach(function(doc){
+      var d=Object.assign({id:doc.id},doc.data());
+      schools.push(d);
+      var now=new Date(),expiry=d.planExpiry?new Date(d.planExpiry):null;
+      if(!expiry||expiry<now)exp++;
+      else if(d.plan==="trial")trial++;
+      else active++;
+    });
+    G("stat-total").textContent=schools.length;
+    G("stat-active").textContent=active;
+    G("stat-trial").textContent=trial;
+    G("stat-exp").textContent=exp;
+    window._adminSchools=schools;
+    renderAdminSchools(schools);
+  });
+}
+
+function renderAdminSchools(schools){
+  var c=G("admin-schools");c.innerHTML="";
+  if(!schools.length){c.innerHTML='<div style="padding:24px;text-align:center;color:var(--text2)">No schools registered yet.</div>';return;}
+  schools.forEach(function(s){
+    var now=new Date(),expiry=s.planExpiry?new Date(s.planExpiry):null;
+    var status=(!expiry||expiry<now)?"expired":(s.plan==="trial"?"trial":"active");
+    var statusLabel=status==="active"?"ACTIVE":status==="trial"?"TRIAL":"EXPIRED";
+    var expiryStr=expiry?expiry.toLocaleDateString("en-PK",{day:"numeric",month:"short",year:"numeric"}):"—";
+    c.innerHTML+='<div class="school-card">'+
+      '<div style="display:flex;align-items:center;gap:10px;flex:1">'+
+        '<div class="status-dot '+status+'"></div>'+
+        '<div class="school-info">'+
+          '<div class="sn">'+(s.name||"Unnamed School")+'</div>'+
+          '<div class="sd">'+(s.email||"")+'  ·  '+(s.city||"")+'  ·  Plan: '+(s.plan||"trial").toUpperCase()+'  ·  Expires: '+expiryStr+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+        '<select onchange="changePlan(\''+s.id+'\',this.value)" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:11px;font-weight:700">'+
+          '<option value="trial" '+(s.plan==="trial"?"selected":"")+'>Trial</option>'+
+          '<option value="manual" '+(s.plan==="manual"?"selected":"")+'>Manual</option>'+
+          '<option value="auto" '+(s.plan==="auto"?"selected":"")+'>Auto Pro</option>'+
+        '</select>'+
+        '<button class="btn btn-green btn-sm" onclick="extendPlan(\''+s.id+'\',30)">+30 Days</button>'+
+        '<button class="btn btn-red btn-sm" onclick="blockSchool(\''+s.id+'\')">Block</button>'+
+      '</div>'+
+    '</div>';
+  });
+}
+
+function searchSchools(){
+  var q=G("admin-srch").value.toLowerCase();
+  if(!window._adminSchools)return;
+  renderAdminSchools(q?window._adminSchools.filter(function(s){return(s.name||"").toLowerCase().includes(q)||(s.email||"").toLowerCase().includes(q);}):window._adminSchools);
+}
+
+function changePlan(uid,plan){
+  var expiry=new Date();expiry.setDate(expiry.getDate()+30);
+  db.collection("schools").doc(uid).update({plan:plan,planExpiry:expiry.toISOString()})
+    .then(function(){toast("Plan updated ✅");loadAdminPanel();});
+}
+
+function extendPlan(uid,days){
+  db.collection("schools").doc(uid).get().then(function(doc){
+    var d=doc.data(),cur=d.planExpiry?new Date(d.planExpiry):new Date();
+    if(cur<new Date())cur=new Date();
+    cur.setDate(cur.getDate()+days);
+    return db.collection("schools").doc(uid).update({planExpiry:cur.toISOString()});
+  }).then(function(){toast("Extended by "+days+" days ✅");loadAdminPanel();});
+}
+
+function blockSchool(uid){
+  if(!confirm("Block this school? They will see expired screen."))return;
+  var past=new Date("2020-01-01");
+  db.collection("schools").doc(uid).update({planExpiry:past.toISOString()})
+    .then(function(){toast("School blocked");loadAdminPanel();});
+}
+
+// ════════════════════════════════════════════════════
+//  AUTH STATE OBSERVER
+// ════════════════════════════════════════════════════
+if(auth){
+  auth.onAuthStateChanged(function(user){
+    if(user){
+      if(user.email===APP_CONFIG.adminEmail){isAdmin=true;loadAdminDashboard();}
+      else{isAdmin=false;loadSchoolData(user);}
+    }
+  });
+}
+</script>
+</body>
+</html>
