@@ -699,8 +699,8 @@ function doLogin(){
 
 function doAdminLogin(){
   G("l-email").value = APP_CONFIG.adminEmail;
-  G("l-pass").value  = APP_CONFIG.adminPassword;
-  doLogin();
+  G("l-pass").value  = "";  // Don't auto-fill password
+  G("l-pass").focus();      // Just focus the password field
 }
 
 function doSignup(){
