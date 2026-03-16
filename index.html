@@ -699,10 +699,9 @@ function doLogin(){
 
 function doAdminLogin(){
   G("l-email").value = APP_CONFIG.adminEmail;
-  G("l-pass").value  = "";  // Don't auto-fill password
-  G("l-pass").focus();      // Just focus the password field
+  G("l-pass").value  = "";
+  G("l-pass").focus();
 }
-
 function doSignup(){
   if(!auth){return showAuthErr("Firebase not configured.");}
   var sname = G("s-sname").value.trim();
@@ -804,15 +803,34 @@ function checkSubscription(data){
 function showApp(){
   G("auth-screen").style.display="none";
   G("app-screen").style.display="flex";
-  // Show admin nav if admin
-  if(isAdmin){
+  // Only add admin button once
+  if(isAdmin && !document.getElementById("admin-nav-btn")){
     var adminBtn = document.createElement("button");
     adminBtn.className="nav-btn";
+    adminBtn.id="admin-nav-btn";
     adminBtn.innerHTML='<span class="nav-icon">👑</span>Admin';
     adminBtn.onclick=function(){navTo("admin",this);};
     document.querySelector(".bottom-nav").appendChild(adminBtn);
   }
   initAllForms();
+}
+```
+
+---
+
+## Bug 3 — No schools showing in Admin Panel
+
+The school you registered is stored under **its own Firebase UID** — not under the admin account. The admin panel reads `db.collection("schools")` which should find it. The issue is **Firestore Rules** are blocking the admin from reading other schools' data.
+
+**Go to Firebase Console → Firestore → Rules tab → Replace everything with:**
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
 }
 
 // ════════════════════════════════════════════════════
