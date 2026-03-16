@@ -11,29 +11,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-  // --- FIREBASE CONFIG ---
-  // Step 1: Go to https://console.firebase.google.com
-  // Step 2: Create project → Add web app → Copy config below
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
- {
-  apiKey: "AIzaSyCL8y8dt2UD7GZ6fXnWt-XmK3vsfPDIndw",
-  authDomain: "classcard-e7094.firebaseapp.com",
-  projectId: "classcard-e7094",
-  storageBucket: "classcard-e7094.firebasestorage.app",
-  messagingSenderId: "518381416522",
-  appId: "1:518381416522:web:8ac3aaf8464d702c1e36b3",
-  measurementId: "G-9EJKB3E6MQ"
-};
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
 <style>
 /* ═══ RESET & BASE ═══════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -627,8 +604,17 @@ var APP_CONFIG = {
 
   // --- ADMIN CREDENTIALS (change these!) ---
   adminEmail:    "meridianeduofficial@gmail.com",   // Your admin email
-  adminPassword: "Admin@Wasim90",        // Your admin password (change this!)
-
+  adminPassword: "Admin@Wasim.70",        // Your admin password (change this!)
+  
+firebase: {
+  apiKey: "AIzaSyCL8y8dt2UD7GZ6fXnWt-XmK3vsfPDIndw",
+  authDomain: "classcard-e7094.firebaseapp.com",
+  projectId: "classcard-e7094",
+  storageBucket: "classcard-e7094.firebasestorage.app",
+  messagingSenderId: "518381416522",
+  appId: "1:518381416522:web:8ac3aaf8464d702c1e36b3"
+}
+  };  
 // ════════════════════════════════════════════════════
 //  FIREBASE INIT
 // ════════════════════════════════════════════════════
@@ -638,7 +624,7 @@ var STUDENTS = []; // in-memory cache
 try {
   firebase.initializeApp(APP_CONFIG.firebase);
   db   = firebase.firestore();
-  auth = firebase.getAuth ? firebase.getAuth() : firebase.auth();
+auth = firebase.auth();
   // Enable offline persistence
   db.enablePersistence().catch(function(){});
 } catch(e) {
