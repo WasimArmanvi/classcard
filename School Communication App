@@ -18,18 +18,6 @@
   // TODO: Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyCL8y8dt2UD7GZ6fXnWt-XmK3vsfPDIndw",
-    authDomain: "classcard-e7094.firebaseapp.com",
-    projectId: "classcard-e7094",
-    storageBucket: "classcard-e7094.firebasestorage.app",
-    messagingSenderId: "518381416522",
-    appId: "1:518381416522:web:8ac3aaf8464d702c1e36b3",
-    measurementId: "G-9EJKB3E6MQ"
-  };
-
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
@@ -613,32 +601,33 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
 // ════════════════════════════════════════════════════
 var APP_CONFIG = {
   // --- YOUR APP NAME & BRANDING ---
-  appName:    "SCHOOL APP",           // Change to your app name
+  appName:    "Classcard",           // Change to your app name
   tagline:    "Professional School Communication",
-  ownerName:  "Your Name",            // Your name shown in admin
-  supportWA:  "923009422517",         // Your WhatsApp for support (no + or 0)
+  ownerName:  "M.Wasim Arshad",            // Your name shown in admin
+  supportWA:  "923057516400",         // Your WhatsApp for support (no + or 0)
 
   // --- SUBSCRIPTION PLANS ---
   plans: {
     trial:    { name:"FREE TRIAL",  days:14,  price:0 },
-    manual:   { name:"MANUAL",      days:30,  price:2000 },
-    auto:     { name:"AUTO PRO",    days:30,  price:10000 },
+    manual:   { name:"MANUAL",      days:30,  price:5000 },
+    auto:     { name:"AUTO PRO",    days:30,  price:15000 },
   },
 
   // --- ADMIN CREDENTIALS (change these!) ---
-  adminEmail:    "admin@yourapp.com",   // Your admin email
-  adminPassword: "Admin@123456",        // Your admin password (change this!)
+  adminEmail:    "meridianeduofficial@gmail.com",   // Your admin email
+  adminPassword: "Admin@Wasim90",        // Your admin password (change this!)
 
   // --- FIREBASE CONFIG ---
   // Step 1: Go to https://console.firebase.google.com
   // Step 2: Create project → Add web app → Copy config below
   firebase: {
-    apiKey:            "YOUR_API_KEY",
-    authDomain:        "YOUR_PROJECT.firebaseapp.com",
-    projectId:         "YOUR_PROJECT_ID",
-    storageBucket:     "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId:             "YOUR_APP_ID"
+   apiKey: "AIzaSyCL8y8dt2UD7GZ6fXnWt-XmK3vsfPDIndw",
+    authDomain: "classcard-e7094.firebaseapp.com",
+    projectId: "classcard-e7094",
+    storageBucket: "classcard-e7094.firebasestorage.app",
+    messagingSenderId: "518381416522",
+    appId: "1:518381416522:web:8ac3aaf8464d702c1e36b3",
+    measurementId: "G-9EJKB3E6MQ"
   }
 };
 
@@ -1202,7 +1191,7 @@ function buildDS(stuNm,cls,roll,show){
   beginCard(W,H);CX.fillStyle=mg(0,0,H);CX.fillRect(0,0,W,H);rr(2,2,W-4,H-4,2,null,SC.pc,2);
   var y=drawHdr(W);y=drawTitle(y,W,"EXAMINATION DATESHEET",title+"     🕐 "+timing);
   if(show){CX.fillStyle=mg(4,y,42);CX.fillRect(4,y,W-8,42);rr(4,y,W-8,42,0,null,SC.pc,1.5);CX.fillStyle=SC.pc;CX.font="bold 13px Arial";CX.fillText("STUDENT: "+stuNm,14,y+16);CX.fillText("CLASS: "+cls+" | ROLL: "+roll,14,y+34);y+=42;}
-  var cols=[[" DATE",110],[" DAY",110],[" SUBJECT",200],[" TIME",120],[" SYLLABUS COVERED (OPTIONAL)",W-8-110-110-200-120]];
+  var cols=[[" DATE",110],[" DAY",110],[" SUBJECT",200],[" TIME",120],[" SYLLABUS COVERED  ",W-8-110-110-200-120]];
   y=drawTH(y,W,cols);
   rows.forEach(function(r,i){y=drawTR(y,W,cols,[r.date,r.day,r.sub,r.time,r.syl],i%2===0);});
   if(note){CX.fillStyle=mg(4,y,32);CX.fillRect(4,y,W-8,32);rr(4,y,W-8,32,0,null,SC.pc,1);CX.fillStyle=SC.pc;CX.font="italic 11px Arial";CX.textAlign="center";CX.fillText("📌 "+note,W/2,y+21);CX.textAlign="left";y+=34;}
