@@ -1069,10 +1069,10 @@ function genD(sid){
   CX.textAlign="right";CX.fillStyle="#777";CX.font="11px Arial";CX.fillText("DATE:  "+date,W-16,y+18);
   CX.textAlign="left";y+=48;
   // Table
-  var cols=[[" DATE",108],[" SUBJECT",138],[" HOMEWORK / CLASSWORK",W-8-108-138-110];
+  var cols=[[" DATE",108],[" SUBJECT",138],[" HOMEWORK / CLASSWORK",W-8-108-138-110]];
   y=drawTH(y,W,cols);
   for(var i=0;i<rows;i++){
-    var r=i<hw.length?hw[i]:{date:"",sub:"",hw:""};
+    var r=i<hw.length?hw[i]:{date:"",sub:"",hw:"",};
     y=drawTR(y,W,cols,[r.date,r.sub,r.hw],i%2===0,rH);
   }
   if(rmk||nxt){
