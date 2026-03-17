@@ -1069,15 +1069,15 @@ function genD(sid){
   CX.textAlign="right";CX.fillStyle="#777";CX.font="11px Arial";CX.fillText("DATE:  "+date,W-16,y+18);
   CX.textAlign="left";y+=48;
   // Table
-  var cols=[[" DATE",108],[" SUBJECT",138],[" HOMEWORK / CLASSWORK",W-8-108-138-110],[" TEACHER INITIALS",110]];
+  var cols=[[" DATE",108],[" SUBJECT",138],[" HOMEWORK / CLASSWORK",W-8-108-138-110];
   y=drawTH(y,W,cols);
   for(var i=0;i<rows;i++){
-    var r=i<hw.length?hw[i]:{date:"",sub:"",hw:"",init:""};
-    y=drawTR(y,W,cols,[r.date,r.sub,r.hw,r.init],i%2===0,rH);
+    var r=i<hw.length?hw[i]:{date:"",sub:"",hw:""};
+    y=drawTR(y,W,cols,[r.date,r.sub,r.hw],i%2===0,rH);
   }
   if(rmk||nxt){
     CX.fillStyle=mg(4,y,40);CX.fillRect(4,y,W-8,40);rr(4,y,W-8,40,0,null,SC.pc,1);
-    CX.fillStyle=SC.pc;CX.font="11px Arial";
+    CX.fillStyle=SC.pc;CX.font="13px Arial";
     if(rmk)CX.fillText("  📌 REMARKS:  "+rmk,10,y+16);
     if(nxt)CX.fillText("  📅 NEXT CLASS:  "+nxt,10,y+32);y+=42;
   }
