@@ -321,7 +321,6 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
             <th style="width:100px">Date</th>
             <th style="width:115px">Subject</th>
             <th>Homework / Classwork</th>
-            <th style="width:85px">Teacher Init.</th>
             <th style="width:32px"></th>
           </tr></thead>
           <tbody id="hw-tbody"></tbody>
@@ -1047,7 +1046,6 @@ function renderHW(){
       '<td><input value="'+(r.date||d)+'" oninput="HWR['+i+'].date=this.value" placeholder="'+d+'" style="width:90px"/></td>'+
       '<td><input value="'+r.sub+'" oninput="HWR['+i+'].sub=this.value" placeholder="Subject" style="min-width:90px"/></td>'+
       '<td><input value="'+r.hw+'" oninput="HWR['+i+'].hw=this.value" placeholder="Homework / classwork description"/></td>'+
-      '<td><input value="'+r.init+'" oninput="HWR['+i+'].init=this.value" placeholder="Init." style="width:60px"/></td>'+
       '<td><button class="hwtbl delbtn" onclick="delHW('+i+')">×</button></td>'+
     '</tr>';
   });
