@@ -3299,7 +3299,7 @@ function drawResultTemplate3(s, mks, title, year, rmk, tot, max, pct, grade) {
   CX.fillStyle="#e8eaf0";CX.fillRect(45,y,W-90,46);
   rr(45,y,W-90,46,0,null,SC.pc,1.5);
   CX.fillStyle="#333";CX.font="14px 'Times New Roman',serif";CX.textAlign="left";
-  CX.fillText("Student Name: _______________________",50,y+20);
+  CX.fillText("Student: _______________________",50,y+20);
   CX.fillStyle=SC.pc;CX.font="bold 14px Arial";CX.fillText(s.nm,145,y+20);
   CX.fillStyle="#333";CX.font="13px 'Times New Roman',serif";
   CX.textAlign="right";CX.fillText("Class: "+s.cl+(s.sec?"-"+s.sec:"")+"    Roll: "+(s.rl||"—"),W-50,y+20);
