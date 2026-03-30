@@ -6,9 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="Classcard"/>
 <title>Classcard</title>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -40,7 +40,6 @@ input,select,textarea,button{font-family:inherit;}
 #splash .si{width:72px;height:72px;background:var(--ac);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:18px;box-shadow:0 8px 28px rgba(184,150,12,0.4);animation:float 3s ease-in-out infinite;}
 #splash h1{color:#fff;font-size:26px;font-weight:900;letter-spacing:1px;}
 #splash p{color:#ffffff66;font-size:12px;margin-top:5px;}
-
 /* AUTH */
 #auth-screen{display:none;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--pr),var(--pl));padding:20px;}
 .ab{background:var(--wh);border-radius:20px;padding:32px 26px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.25);animation:fadeIn 0.5s ease-out;}
@@ -85,13 +84,52 @@ input,select,textarea,button{font-family:inherit;}
 #nbanner p{color:#fff;font-size:12px;flex:1;}
 #nbanner button{background:rgba(0,0,0,0.2);border:none;color:#fff;padding:4px 9px;border-radius:5px;cursor:pointer;font-size:11px;}
 
-/* NAV */
+/* ── SIDEBAR ─────────────────────────────────────── */
+#sb-ov{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:298;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+#sb-ov.open{opacity:1;pointer-events:all;}
+#sidebar{position:fixed;top:0;left:0;width:270px;height:100%;background:#0B1740;z-index:299;transform:translateX(-100%);transition:transform 0.3s cubic-bezier(.4,0,.2,1);overflow-y:auto;display:flex;flex-direction:column;}
+#sidebar.open{transform:translateX(0);}
+.sb-hd{padding:16px 14px 13px;border-bottom:1px solid rgba(255,255,255,0.09);display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.2);}
+.sb-hd-logo{width:38px;height:38px;background:var(--ac);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#0B1740;flex-shrink:0;}
+.sb-hd-info{flex:1;min-width:0;}
+.sb-hd-info h3{color:#fff;font-size:12.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-hd-info p{color:rgba(255,255,255,0.4);font-size:10px;margin-top:1px;}
+#sb-close{background:none;border:none;color:rgba(255,255,255,0.4);font-size:20px;cursor:pointer;padding:4px;line-height:1;border-radius:6px;transition:all 0.2s;}
+#sb-close:hover{background:rgba(255,255,255,0.1);color:#fff;}
+.sb-body{flex:1;padding:10px 8px 6px;}
+.sb-sec{margin-bottom:2px;}
+.sb-trig{width:100%;background:none;border:none;color:rgba(255,255,255,0.75);padding:10px 12px;text-align:left;font-size:12.5px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-radius:9px;transition:all 0.18s;font-family:inherit;}
+.sb-trig:hover{background:rgba(255,255,255,0.08);color:#fff;}
+.sb-trig.active{background:rgba(184,150,12,0.15);color:var(--ac);}
+.sb-trig .arr{font-size:10px;opacity:0.5;transition:transform 0.2s;}
+.sb-trig.open .arr{transform:rotate(180deg);}
+.sb-sub{display:none;padding:2px 0 4px 12px;}
+.sb-sub.open{display:block;}
+.sb-item{padding:9px 14px 9px 12px;color:rgba(255,255,255,0.55);cursor:pointer;border-radius:7px;font-size:12px;font-weight:500;transition:all 0.16s;border-left:2px solid transparent;display:flex;align-items:center;gap:8px;}
+.sb-item:hover{background:rgba(255,255,255,0.09);color:#fff;border-left-color:rgba(255,255,255,0.25);}
+.sb-item.on{background:linear-gradient(90deg,rgba(184,150,12,0.22),transparent);color:var(--ac);font-weight:700;border-left-color:var(--ac);}
+.sb-divider{height:1px;background:rgba(255,255,255,0.07);margin:8px 10px;}
+.sb-role{margin:6px 10px;padding:5px 10px;border-radius:6px;font-size:10px;font-weight:800;letter-spacing:0.5px;text-align:center;}
+.sb-role.teacher-r{background:rgba(184,150,12,0.18);color:var(--ac);border:1px solid rgba(184,150,12,0.3);}
+.sb-role.admin-r{background:rgba(220,50,50,0.18);color:#FF7B7B;border:1px solid rgba(220,50,50,0.3);}
+.sb-role.principal-r{background:rgba(26,122,74,0.18);color:#4ADE80;border:1px solid rgba(26,122,74,0.3);}
+.sb-ft{padding:10px 8px 16px;}
+.sb-signout{width:100%;background:rgba(192,57,43,0.15);border:1px solid rgba(192,57,43,0.3);color:#FF7B7B;padding:10px;border-radius:9px;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;transition:all 0.2s;}
+.sb-signout:hover{background:rgba(192,57,43,0.3);}
+/* Teacher read-only banner */
+#tchr-banner{background:linear-gradient(90deg,#7D5A00,var(--ac));padding:7px 14px;display:none;align-items:center;gap:8px;}
+#tchr-banner span{color:#fff;font-size:11px;font-weight:700;}
+
+/* NAV — slim bottom bar (4 quick-access + menu) */
 .bnav{background:var(--wh);border-top:1px solid var(--bd);display:flex;position:sticky;bottom:0;z-index:100;box-shadow:0 -3px 14px rgba(0,0,0,0.06);}
 .nbtn{flex:1;padding:9px 2px 7px;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:8px;font-weight:700;color:var(--t2);transition:all 0.2s;}
 .nbtn .ni{font-size:19px;line-height:1;transition:transform 0.2s;}
 .nbtn:hover .ni{transform:scale(1.1);}
 .nbtn.on{color:var(--pr);}
 .nbtn.on .ni{transform:scale(1.15);}
+.nbtn-menu .ni{color:var(--pr);}
+.hamburger-hdr{background:rgba(255,255,255,0.13);border:1px solid rgba(255,255,255,0.22);color:#fff;padding:7px 11px;border-radius:8px;cursor:pointer;font-size:18px;line-height:1;transition:all 0.2s;}
+.hamburger-hdr:hover{background:rgba(255,255,255,0.25);}
 
 /* PAGES */
 .pwrap{flex:1;overflow-y:auto;padding:10px;max-width:920px;margin:0 auto;width:100%;}
@@ -167,11 +205,10 @@ input,select,textarea,button{font-family:inherit;}
 /* HW TABLE — COMPACT */
 .hwtbl{width:100%;border-collapse:collapse;font-size:12px;}
 .hwtbl th{background:var(--pr);color:#fff;padding:7px 8px;text-align:left;font-size:10px;letter-spacing:0.3px;}
-.hwtbl td{padding:4px 6px;border-bottom:1px solid #EAECF0;}
-.hwtbl td input{border:none;border-bottom:1px solid var(--bd);background:transparent;width:100%;font-size:12px;padding:3px 2px;outline:none;}
-.hwtbl td:nth-child(1){width:80px;}
-.hwtbl td:nth-child(2){width:100px;}
-.hwtbl td:nth-child(3){min-width:0;}
+.hwtbl td{padding:6px 6px;border-bottom:1px solid #EAECF0;}
+.hwtbl td input{border:none;border-bottom:1px solid var(--bd);background:transparent;width:100%;font-size:12px;padding:4px 2px;outline:none;}
+.hwtbl td:nth-child(1){width:100px;}
+.hwtbl td:nth-child(2){min-width:0;}
 .hwtbl tr:nth-child(even) td{background:#F7F8FA;}
 .hwtbl tr:nth-child(odd) td{background:#FFFFFF;}
 .del-td{width:28px;}
@@ -288,73 +325,145 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
 .copy-btn:active{background:var(--pr);color:#fff;}
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px;}
+
+/* FEE TRACKER */
+.ft-row{display:grid;grid-template-columns:1fr 55px 70px 60px;gap:6px;align-items:center;padding:9px 10px;border-bottom:1px solid var(--gy);font-size:12px;}
+.ft-row:last-child{border-bottom:none;}
+.ft-row:nth-child(odd){background:#F8FAFF;}
+.ft-row:nth-child(even){background:#fff;}
+.ft-badge-paid{background:#E8F5E9;color:var(--gn);border-radius:8px;padding:3px 8px;font-size:10px;font-weight:800;text-align:center;}
+.ft-badge-pend{background:#FFF3E0;color:#E65100;border-radius:8px;padding:3px 8px;font-size:10px;font-weight:800;text-align:center;}
+.ft-pay-btn{background:var(--gn);color:#fff;border:none;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.ft-pay-btn:active{opacity:0.8;}
+.ft-unpay-btn{background:var(--gy);color:var(--t2);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;font-size:10px;font-weight:700;cursor:pointer;}
+
+/* ATTENDANCE */
+.att-stu-row{display:flex;align-items:center;gap:8px;padding:9px 10px;border-bottom:1px solid var(--gy);background:#fff;}
+.att-stu-row:nth-child(odd){background:#F8FAFF;}
+.att-stu-row:last-child{border-bottom:none;}
+.att-name{flex:1;font-size:13px;font-weight:700;color:var(--tx);}
+.att-sub{font-size:10px;color:var(--t2);}
+.att-p{border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:800;cursor:pointer;background:#E8F5E9;color:var(--gn);transition:all 0.15s;}
+.att-p.on{background:var(--gn);color:#fff;}
+.att-a{border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:800;cursor:pointer;background:#FDEDEC;color:var(--rd);transition:all 0.15s;}
+.att-a.on{background:var(--rd);color:#fff;}
+.att-stats{display:flex;gap:8px;padding:10px 12px;background:linear-gradient(135deg,var(--pr),var(--pl));border-radius:10px;margin-bottom:10px;}
+.att-stat{flex:1;text-align:center;}
+.att-stat .num{font-size:22px;font-weight:900;color:#fff;}
+.att-stat .lbl{font-size:9px;color:#ffffff77;text-transform:uppercase;letter-spacing:0.5px;}
+
+/* CARD VIEWER */
+#cv-modal{position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;padding:12px;}
+#cv-modal.open{display:flex;}
+#cv-img{max-width:100%;max-height:78vh;border-radius:10px;object-fit:contain;}
+#cv-close{position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:24px;line-height:1;display:flex;align-items:center;justify-content:center;}
+#cv-btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center;width:100%;max-width:440px;}
+.cv-msg{background:rgba(255,255,255,0.08);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,0.75);margin-top:8px;max-width:440px;width:100%;max-height:120px;overflow-y:auto;line-height:1.7;white-space:pre-wrap;word-break:break-word;}
+.cv-hint{font-size:11px;color:rgba(255,255,255,0.4);margin-top:6px;text-align:center;}
+.cv-btn-wa{flex:2;background:linear-gradient(135deg,#25D366,#128C3C);color:#fff;border:none;border-radius:22px;padding:13px 20px;font-size:14px;font-weight:700;cursor:pointer;}
+.cv-btn-dl{background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25);border-radius:12px;padding:12px 16px;font-size:13px;font-weight:700;cursor:pointer;}
+.cv-btn-copy{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:12px 16px;font-size:13px;font-weight:700;cursor:pointer;}
 </style>
 </head>
 <body>
 
 <!-- SPLASH -->
 <div id="splash">
+    <!-- Script inside splash to ensure it always eventually dismisses -->
+  <script>
+    // Absolute failsafe: splash must never show more than 8 seconds
+    setTimeout(function(){
+      var sp=document.getElementById("splash");
+      var au=document.getElementById("auth-screen");
+      if(sp&&sp.style.display!=="none"&&!sp.classList.contains("hide")){
+        sp.classList.add("hide");
+        setTimeout(function(){sp.style.display="none";if(au)au.style.display="flex";},400);
+      }
+    },8000);
+  </script>
+
   <div class="si">📚</div>
   <h1 id="splash-name">DiaryDeck</h1>
   <p>Professional School Communication</p>
 </div>
 
-<!-- AUTH -->
-<div id="auth-screen">
-  <div class="ab">
-    <div class="al">
-      <div class="li">📚</div>
-      <h1 id="auth-app-name">CLASSCARD</h1>
-      <p id="auth-tagline">Professional School Communication</p>
+<div id="auth-screen" style="display: flex;">
+  <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:440px;padding:20px">
+
+    <!-- Logo + Name -->
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="width:72px;height:72px;background:linear-gradient(135deg,var(--ac),#D4A813);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;box-shadow:0 8px 24px rgba(184,150,12,0.4)" id="auth-icon">📚</div>
+      <h1 id="auth-app-name" style="color:#fff;font-size:28px;font-weight:900;letter-spacing:1px">Classcard</h1>
+      <p id="auth-tagline" style="color:rgba(255,255,255,0.6);font-size:13px;margin-top:4px">Professional School Communication</p>
     </div>
-    <div class="atabs">
-      <button class="atab on" onclick="switchTab('login',this)">Sign In</button>
-      <button class="atab" onclick="switchTab('signup',this)">Register</button>
+
+    <!-- Auth Card -->
+    <div class="ab" style="width:100%;margin:0">
+      <div class="atabs">
+        <button class="atab on" onclick="switchTab('login',this)">Sign In</button>
+        <button class="atab" onclick="switchTab('signup',this)">Register</button>
+      </div>
+      <div class="aerr" id="aerr"></div>
+      <div class="aok" id="aok"></div>
+      <div id="auth-login">
+        <div class="fld"><label>Email</label><input id="l-email" type="email" placeholder="school@email.com" autocomplete="email"></div>
+        <div class="fld"><label>Password</label><input id="l-pass" type="password" placeholder="••••••••"></div>
+        <button class="abtn" onclick="doLogin()">Sign In →</button>
+        <button class="fp-btn" onclick="doForgotPass()">Forgot password?</button>
+      </div>
+      <div id="auth-signup" style="display:none">
+        <div class="fld"><label>School Name</label><input id="s-sname" placeholder="e.g. Al-Noor Public School"></div>
+        <div class="fld"><label>Email</label><input id="s-email" type="email" placeholder="school@email.com"></div>
+        <div class="fld"><label>Password (min 6 chars)</label><input id="s-pass" type="password" placeholder="••••••••"></div>
+        <div class="fld"><label>City</label><input id="s-city" placeholder="e.g. Lahore"></div>
+        <button class="abtn" onclick="doSignup()">Create Account →</button>
+        <p style="font-size:11px;color:var(--t2);text-align:center;margin-top:9px">✅ Free 14-day trial · No credit card needed</p>
+      </div>
     </div>
-    <div class="aerr" id="aerr"></div>
-    <div class="aok" id="aok"></div>
-    <div id="auth-login">
-      <div class="fld"><label>Email</label><input id="l-email" type="email" placeholder="school@email.com" autocomplete="email"/></div>
-      <div class="fld"><label>Password</label><input id="l-pass" type="password" placeholder="••••••••"/></div>
-      <button class="abtn" onclick="doLogin()">Sign In →</button>
-      <button class="fp-btn" onclick="doForgotPass()">Forgot password?</button>
-    </div>
-    <div id="auth-signup" style="display:none">
-      <div class="fld"><label>School Name</label><input id="s-sname" placeholder="e.g. Al-Noor Public School"/></div>
-      <div class="fld"><label>Email</label><input id="s-email" type="email" placeholder="school@email.com"/></div>
-      <div class="fld"><label>Password (min 6 chars)</label><input id="s-pass" type="password" placeholder="••••••••"/></div>
-      <div class="fld"><label>City</label><input id="s-city" placeholder="e.g. Lahore"/></div>
-      <button class="abtn" onclick="doSignup()">Create Account →</button>
-      <p style="font-size:11px;color:var(--t2);text-align:center;margin-top:9px">✅ Free 14-day trial · No credit card needed</p>
-    </div>
-    <!-- Pricing plan teaser below auth box -->
-    <div style="margin-top:14px;width:100%;max-width:400px">
-      <div style="color:#ffffffbb;font-size:10px;font-weight:700;text-align:center;letter-spacing:1.5px;margin-bottom:8px;text-transform:uppercase">💰 Pricing Plans</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px">
-        <div style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);border-radius:12px;padding:12px 6px 10px;text-align:center">
-          <div style="font-size:16px;margin-bottom:4px">🎁</div>
-          <div style="color:#FFD700;font-size:10px;font-weight:800;letter-spacing:0.5px">FREE</div>
-          <div style="color:#fff;font-size:22px;font-weight:900;margin:3px 0;line-height:1">Rs.0</div>
-          <div style="color:#ffffff88;font-size:9px;margin-top:2px">14 days trial</div>
+
+    <!-- Pricing — full redesign -->
+    <div style="margin-top:20px;width:100%">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.15)"></div>
+        <div style="color:rgba(255,255,255,0.5);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase">Pricing Plans</div>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.15)"></div>
+      </div>
+
+      <!-- Free Trial — full width, prominent -->
+      <div style="background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,215,0,0.08));border:1.5px solid rgba(255,215,0,0.4);border-radius:14px;padding:14px 18px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="color:#FFD700;font-size:13px;font-weight:900;letter-spacing:0.5px">🎁 FREE TRIAL</div>
+          <div style="color:rgba(255,255,255,0.7);font-size:11px;margin-top:3px">All features · No credit card needed</div>
         </div>
-        <div style="background:rgba(184,150,12,0.25);border:1.5px solid rgba(212,168,19,0.6);border-radius:12px;padding:12px 6px 10px;text-align:center">
-          <div style="font-size:16px;margin-bottom:4px">✍️</div>
-          <div style="color:#FFD700;font-size:10px;font-weight:800;letter-spacing:0.5px">MANUAL</div>
-          <div style="color:#fff;font-size:22px;font-weight:900;margin:3px 0;line-height:1">5K</div>
-          <div style="color:#ffffffaa;font-size:9px;margin-top:2px">per month</div>
-        </div>
-        <div style="background:rgba(26,122,74,0.25);border:1.5px solid rgba(76,175,80,0.5);border-radius:12px;padding:12px 6px 10px;text-align:center">
-          <div style="font-size:16px;margin-bottom:4px">🚀</div>
-          <div style="color:#4ADE80;font-size:10px;font-weight:800;letter-spacing:0.5px">AUTO PRO</div>
-          <div style="color:#fff;font-size:22px;font-weight:900;margin:3px 0;line-height:1">15K</div>
-          <div style="color:#ffffffaa;font-size:9px;margin-top:2px">per month</div>
+        <div style="text-align:right">
+          <div style="color:#fff;font-size:28px;font-weight:900;line-height:1">Rs. 0</div>
+          <div style="color:rgba(255,255,255,0.5);font-size:10px">14 days</div>
         </div>
       </div>
-      <p style="text-align:center;color:#ffffff55;font-size:9px;margin-top:8px">Contact us on WhatsApp to upgrade your plan</p>
+
+      <!-- Paid plans — 2 columns -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div style="background:rgba(184,150,12,0.18);border:1.5px solid rgba(212,168,19,0.5);border-radius:12px;padding:12px;text-align:center">
+          <div style="font-size:18px;margin-bottom:5px">✍️</div>
+          <div style="color:#FFD700;font-size:10px;font-weight:800;letter-spacing:0.5px">MANUAL</div>
+          <div style="color:#fff;font-size:20px;font-weight:900;margin:4px 0;line-height:1">Rs. 5K</div>
+          <div style="color:rgba(255,255,255,0.55);font-size:9px;line-height:1.6">per month<br>150 students</div>
+        </div>
+        <div style="background:rgba(26,122,74,0.22);border:1.5px solid rgba(76,175,80,0.5);border-radius:12px;padding:12px;text-align:center;position:relative;overflow:hidden">
+          <div style="position:absolute;top:6px;right:6px;background:#4ADE80;color:#0D1B4B;font-size:8px;font-weight:800;padding:2px 6px;border-radius:8px">BEST</div>
+          <div style="font-size:18px;margin-bottom:5px">🚀</div>
+          <div style="color:#4ADE80;font-size:10px;font-weight:800;letter-spacing:0.5px">AUTO PRO</div>
+          <div style="color:#fff;font-size:20px;font-weight:900;margin:4px 0;line-height:1">Rs. 15K</div>
+          <div style="color:rgba(255,255,255,0.55);font-size:9px;line-height:1.6">per month<br>500 students + AI</div>
+        </div>
+      </div>
+
+      <a href="https://wa.me/923057516400?text=I+want+to+know+about+Classcard+pricing" target="_blank" style="display:block;text-align:center;padding:11px;background:rgba(37,211,102,0.2);border:1px solid rgba(37,211,102,0.4);border-radius:10px;color:#4ADE80;font-size:12px;font-weight:700;text-decoration:none">
+        📱 WhatsApp for Pricing & Yearly Discounts
+      </a>
     </div>
   </div>
 </div>
-
 <!-- LOCKED -->
 <div class="lock" id="locked">
   <div style="font-size:50px;margin-bottom:12px">🔒</div>
@@ -366,7 +475,12 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
 <!-- MAIN APP -->
 <div id="app-screen">
   <div class="app-hdr">
-    <div id="app-logo">CC</div>
+    <button class="hamburger-hdr" onclick="openSB()" title="Menu">☰</button>
+        <div id="app-logo" style="overflow:hidden;display:flex;align-items:center;justify-content:center">
+      <img id="app-logo-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:9px"/>
+      <span id="app-logo-initials">CC</span>
+    </div>
+
     <div class="ahi">
       <h1 id="app-school-name">Loading...</h1>
       <p id="app-plan-sub">School Communication</p>
@@ -381,6 +495,9 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
     <p id="ntext"></p>
     <button onclick="dismissN()">✕</button>
   </div>
+  <div id="tchr-banner">
+    <span>🏫 Teacher Mode — <b id="tchr-class-lbl">Class</b> — Read Only</span>
+  </div>
 
   <div class="pwrap">
 
@@ -388,34 +505,11 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
     <div id="pg-diary" class="pg on">
       <div class="sh" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
   <div><h2>📝 Daily Work & Remarks</h2><p>Fill homework → Generate for class OR individual</p></div>
-  <button onclick="quickDiary()" style="background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:6px 13px;border-radius:7px;cursor:pointer;font-size:11px;font-weight:700;flex-shrink:0">⚡ Quick Diary</button>
+ 
 </div>
 
       <div class="uc">
-        <!-- Template Selector -->
-        <div class="tpl-grid">
-          <div class="tpl-card on" onclick="selectTemplate('diary',1,this)">
-            <div class="tpl-icon">🎯</div>
-            <div class="tpl-name">Modern Minimal</div>
-            <div class="tpl-desc">Clean & Professional</div>
-          </div>
-          <div class="tpl-card" onclick="selectTemplate('diary',2,this)">
-            <div class="tpl-icon">✨</div>
-            <div class="tpl-name">Gradient Elegant</div>
-            <div class="tpl-desc">Beautiful Gradients</div>
-          </div>
-          <div class="tpl-card" onclick="selectTemplate('diary',3,this)">
-            <div class="tpl-icon">🏛️</div>
-            <div class="tpl-name">Classic School</div>
-            <div class="tpl-desc">Traditional Look</div>
-          </div>
-        </div>
-
-        <!-- Mode toggle -->
-        <div class="mode-tabs">
-          <button class="mode-tab on" id="d-mode-class" onclick="setDiaryMode('class',this)">🏫 Whole Class</button>
-          <button class="mode-tab" id="d-mode-stu" onclick="setDiaryMode('student',this)">👤 Individual</button>
-        </div>
+        <div style="background:linear-gradient(135deg,#E8F0FF,#EFF4FF);border-radius:9px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:var(--pr);font-weight:700">🏫 Whole Class Mode</div>
 
         <!-- Class info bar — Class first, then Date -->
         <div class="g3">
@@ -424,9 +518,6 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
           </div>
           <div class="f"><label>Class</label>
             <input id="d-class" placeholder="e.g. Prep,1,2"/>
-          </div>
-          <div class="f"><label>Date (DD-MM-YY)</label>
-            <input id="d-date-mask" placeholder="DD-MM-YY" maxlength="8" oninput="dateMask(this)" style="letter-spacing:2px;font-family:monospace;font-size:14px"/>
           </div>
           <div class="f"><label>Section</label>
             <input id="d-sec" placeholder="A (optional)"/>
@@ -441,7 +532,7 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
         <div style="overflow-x:auto">
         <table class="hwtbl">
           <thead><tr>
-            <th style="width:80px">Date</th>
+            
             <th style="width:100px">Subject</th>
             <th>Homework / Classwork Description</th>
             <th style="width:28px"></th>
@@ -454,17 +545,31 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
           <div class="f"><label>📌 Teacher Remarks</label><input id="d-rmk" placeholder="Keep up the good work!"/></div>
           <div class="f"><label>📅 Next Class Info</label><input id="d-nxt" placeholder="Bring Calculator on Monday!"/></div>
         </div>
+ <!-- Template Selector -->
+        <div class="tpl-grid">
+          <div class="tpl-card on" onclick="selectTemplate('diary',1,this)">
+            <div class="tpl-icon">🎯</div>
+            <div class="tpl-name">Minimal</div>
+            <div class="tpl-desc">Clean & Professional</div>
+          </div>
+          <div class="tpl-card" onclick="selectTemplate('diary',2,this)">
+            <div class="tpl-icon">✨</div>
+            <div class="tpl-name">Elegant</div>
+            <div class="tpl-desc">Beautiful Gradients</div>
+          </div>
+          <div class="tpl-card" onclick="selectTemplate('diary',3,this)">
+            <div class="tpl-icon">🏛️</div>
+            <div class="tpl-name">Classic</div>
+            <div class="tpl-desc">Traditional Look</div>
+          </div>
+        </div>
 
         <!-- CLASS MODE: generate directly -->
         <div id="d-class-generate" style="margin-top:4px">
           <button class="btn bpr bfw btn-pulse" onclick="genDiaryClass()">📸 Generate Class Diary Card</button>
         </div>
 
-        <!-- STUDENT MODE: search and select -->
-        <div id="d-student-generate" style="display:none;margin-top:4px">
-          <input id="d-srch" style="width:100%;padding:9px 14px;border:1.5px solid var(--bd);border-radius:20px;font-size:13px;outline:none;margin-bottom:9px;background:var(--wh)" placeholder="🔍 Search student..." oninput="fS('d')"/>
-          <div id="d-stds" class="sgrid"></div>
-        </div>
+
       </div>
 
       <div id="d-out" class="obox" style="display:none">
@@ -474,58 +579,28 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
         </div>
         <div id="d-iw"><div class="imgwrap"><img id="d-img"/></div></div>
         <div id="d-mw" class="msgbox" style="display:none"></div>
-        <div class="shint" id="d-ht">🤖 Long-press → Save → WhatsApp → Attach → Send ✅<br>📲 Or copy WA Message → Paste in WhatsApp group</div>
-        <a id="d-wa" href="#" target="_blank" class="bwa">📱 Open WhatsApp with Message</a>
+        <div class="shint" id="d-ht">View card → copy message → share to WhatsApp group</div>
+        <div style="display:flex;gap:7px;margin-top:6px;flex-wrap:wrap">
+          <button class="btn" style="flex:2;background:#25D366;color:#fff;border:none;border-radius:22px;padding:12px;font-size:13px;font-weight:700;cursor:pointer" onclick="showCardViewer('d-img',G('d-mw').textContent,'','Diary')">👁 View Card &amp; Share</button>
+          <button class="btn bgh bsm" onclick="dlCard('d-img','Diary')">💾 Download</button>
+        </div>
+        <a id="d-wa" href="#" target="_blank" class="bwa" style="display:none">WA</a>
       </div>
     </div>
 
     <!-- ═══ RESULTS ══════════════════════════════ -->
     <div id="pg-results" class="pg">
-      <div class="sh" style="background:linear-gradient(135deg,#4A1580,#6C3483)"><h2>📊 Examination Result Card</h2><p>Add/remove subjects freely</p></div>
+      <div class="sh" style="background:linear-gradient(135deg,#4A1580,#6C3483)"><h2>📊 Examination</h2><p>Result Card,AI ,Pdf Extractor and Date Sheet</p></div>
       
       <div class="uc">
-        <!-- Template Selector -->
-        <div class="tpl-grid">
-          <div class="tpl-card on" onclick="selectTemplate('result',1,this)">
-            <div class="tpl-icon">🎯</div>
-            <div class="tpl-name">Modern Minimal</div>
-            <div class="tpl-desc">Clean & Professional</div>
-          </div>
-          <div class="tpl-card" onclick="selectTemplate('result',2,this)">
-            <div class="tpl-icon">✨</div>
-            <div class="tpl-name">Gradient Elegant</div>
-            <div class="tpl-desc">Beautiful Gradients</div>
-          </div>
-          <div class="tpl-card" onclick="selectTemplate('result',3,this)">
-            <div class="tpl-icon">🏛️</div>
-            <div class="tpl-name">Classic School</div>
-            <div class="tpl-desc">Traditional Look</div>
-          </div>
-        </div>
+       
 
         <div class="g3">
           <div class="f"><label>Exam Title</label><input id="r-title" value="Final Term Examination"/></div>
           <div class="f"><label>Year</label><input id="r-year" value="2026"/></div>
           <div class="f"><label>Class Filter</label><select id="r-cls"></select></div>
         </div>
-
-        <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 6px">
-          <div style="font-weight:700;color:var(--pr);font-size:11px;text-transform:uppercase">📊 Subjects & Marks</div>
-          <button class="btn bgh bsm" onclick="addSub()">+ Subject</button>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 70px 70px 28px;gap:5px;margin-bottom:5px;font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;padding:0 2px">
-          <span>Subject</span><span style="text-align:center">Obtained</span><span style="text-align:center">Out of</span><span></span>
-        </div>
-        <div id="sub-rows"></div>
-
-        <div class="g2" style="margin-top:10px">
-          <div class="f"><label>Principal Remarks</label><input id="r-rmk" placeholder="Excellent performance!"/></div>
-          <div class="f"><label>Next Term Starts</label><input id="r-nxt" placeholder="1 Feb 2026"/></div>
-        </div>
-      </div>
-
-
-        <!-- Result Mode Toggle -->
+ <!-- Result Mode Toggle -->
         <div class="mode-tabs" style="margin-bottom:12px">
           <button class="mode-tab on" id="r-mode-manual" onclick="setResMode('manual',this)">✍️ Manual Entry</button>
           <button class="mode-tab" id="r-mode-db" onclick="setResMode('db',this)">👥 From Database</button>
@@ -539,17 +614,62 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
             <div class="f"><label>Roll No</label><input id="r-mrl" placeholder="e.g. 001"/></div>
           </div>
           <div class="f"><label>WhatsApp No.</label><input id="r-mwa" placeholder="03001234567" type="tel"/></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 6px">
+          <div style="font-weight:700;color:var(--pr);font-size:11px;text-transform:uppercase">📊 Subjects & Marks</div>
+          <button class="btn bgh bsm" onclick="addSub()">+ Subject</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 70px 70px 28px;gap:5px;margin-bottom:5px;font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;padding:0 2px">
+          <span>Subject</span><span style="text-align:center">Obtained</span><span style="text-align:center">Out of</span><span></span>
+        </div>
+        <div id="sub-rows"></div>
+
+        <div class="g2" style="margin-top:10px">
+          <div class="f"><label>Principal Remarks</label><input id="r-rmk" placeholder="Excellent performance!"/></div>
+          <div class="f"><label>Next Term Starts</label><input id="r-nxt" placeholder="1 Feb 2026"/></div>
+          
+        </div>
+      </div>
+ <!-- Template Selector -->
+        <div class="tpl-grid">
+          <div class="tpl-card on" onclick="selectTemplate('result',1,this)">
+            <div class="tpl-icon">🎯</div>
+            <div class="tpl-name"> Minimal</div>
+            
+          </div>
+          <div class="tpl-card" onclick="selectTemplate('result',2,this)">
+            <div class="tpl-icon">✨</div>
+            <div class="tpl-name"> Elegant</div>
+            
+          </div>
+          <div class="tpl-card" onclick="selectTemplate('result',3,this)">
+            <div class="tpl-icon">🏛️</div>
+            <div class="tpl-name">Classic</div>
+            
+          </div>
+        </div>
+
+       
           <button class="btn bpr bfw btn-pulse" style="margin-top:6px" onclick="genRManual()">📸 Generate Result Card</button>
         </div>
         <!-- DB mode search -->
         <div id="r-db-fields" style="display:none">
-
+          <div class="g2" style="margin-bottom:8px">
+            <div class="f"><label>Class Filter</label>
+              <select id="r-db-cls" onchange="fS('r')" style="width:100%;padding:8px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;outline:none">
+                <option value="">All Classes</option>
+              </select>
+            </div>
+            <div class="f"><label>Search</label>
+              <input id="r-srch2" placeholder="🔍 Name..." oninput="fS('r')" style="width:100%;padding:8px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;outline:none"/>
+            </div>
+          </div>
+          <div id="r-stds" class="sgrid"></div>
         </div>
 
       <!-- OCR IMAGE UPLOAD — Bulk or Single -->
       <div class="uc" style="border:2px solid #C8E6C9;background:linear-gradient(135deg,#F1F8E9,#E8F5E9)">
         <div class="sec-lbl" style="color:#1A5C35;border-color:#A5D6A7">🤖 AI Mark Sheet Reader — Image Upload</div>
-        <p style="font-size:12px;color:#2E7D32;margin-bottom:10px;line-height:1.6">Upload <b>one or many</b> photos of mark sheets → AI reads names &amp; marks from each → generates result cards automatically.</p>
+        <p style="font-size:12px;color:#2E7D32;margin-bottom:10px;line-height:1.6">Upload <b>one or many</b> photos of mark sheets → AI reads names & marks from each → generates result cards automatically.</p>
         <div style="display:flex;gap:7px;margin-bottom:10px">
           <button class="btn bsm" style="flex:1;background:#1A7A4A;color:#fff" onclick="G('ocr-input').click()">📷 Upload 1 Photo</button>
           <button class="btn bsm" style="flex:1;background:#0D5C35;color:#fff" onclick="G('ocr-multi-input').click()">📚 Upload Multiple Photos</button>
@@ -570,34 +690,6 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
       
       </div>
 
-      <!-- PDF import -->
-      <div class="uc">
-        <div class="sec-lbl">📄 Board Result PDF — Auto Import</div>
-        <p style="font-size:12px;color:var(--t2);margin-bottom:10px;line-height:1.6">Upload board result PDF → matches all students from database → generate cards one by one OR all at once.</p>
-        <div class="pdf-drop" onclick="G('pdf-input').click()">
-          <div style="font-size:32px">📄</div>
-          <h3 style="font-size:13px;color:var(--pr);margin-top:6px">Click to Upload Board Result PDF</h3>
-          <p>ICAP / Punjab Board / any text-based PDF</p>
-        </div>
-        <input type="file" id="pdf-input" accept=".pdf" style="display:none" onchange="handlePDF(this)"/>
-        <div class="pdf-bar-wrap" id="pdf-prog"><div class="pdf-bar" id="pdf-bar"></div></div>
-        <div id="pdf-status" style="font-size:12px;color:var(--t2);margin-top:7px;text-align:center;font-weight:600;min-height:18px"></div>
-        <!-- Bulk action bar — shown after PDF loaded -->
-        <div id="pdf-bulk-bar" style="display:none;margin-top:10px;padding:10px 12px;background:linear-gradient(135deg,#EBF5FF,#E8F0FF);border-radius:9px;border:1px solid #B8D4F8">
-          <div style="font-size:12px;font-weight:700;color:var(--pr);margin-bottom:7px" id="pdf-match-info">0 students matched</div>
-          <div style="display:flex;gap:7px;flex-wrap:wrap">
-            <button class="btn bpr bsm" onclick="genAllPDFCards()">🖼 Generate ALL Cards</button>
-            <button class="btn bgh bsm" onclick="savePDFCardsPack()">💾 Save All Images</button>
-          </div>
-        </div>
-        <div id="pdf-results" style="margin-top:10px"></div>
-        <!-- Bulk card gallery -->
-        <div id="pdf-bulk-gallery" style="display:none;margin-top:12px">
-          <div style="font-weight:700;color:var(--pr);font-size:12px;margin-bottom:8px" id="pdf-bulk-title">Generated Cards:</div>
-          <div id="pdf-bulk-cards" style="display:flex;flex-direction:column;gap:10px"></div>
-        </div>
-      </div>
-
       <input id="r-srch" style="width:100%;padding:9px 14px;border:1.5px solid var(--bd);border-radius:20px;font-size:13px;outline:none;margin-bottom:10px;background:var(--wh)" placeholder="🔍 Search student..." oninput="fS('r')"/>
       <div id="r-stds" class="sgrid"></div>
       <div id="r-out" class="obox" style="display:none">
@@ -607,14 +699,71 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
         </div>
         <div id="r-iw"><div class="imgwrap"><img id="r-img"/></div></div>
         <div id="r-mw" class="msgbox" style="display:none"></div>
-        <div class="shint" id="r-ht">🤖/🍎 Long-press → Save → WhatsApp ✅</div>
-        <a id="r-wa" href="#" target="_blank" class="bwa">📱 Open WhatsApp with Message</a>
+        <div class="shint" id="r-ht">View card → tap Send → WhatsApp opens with message pre-typed</div>
+        <div style="display:flex;gap:7px;margin-top:6px;flex-wrap:wrap">
+          <button class="btn" style="flex:2;background:#25D366;color:#fff;border:none;border-radius:22px;padding:12px;font-size:13px;font-weight:700;cursor:pointer" onclick="showCardViewer('r-img',G('r-mw').textContent,_rPhone,'Result_'+(_lastRN||'card'))">👁 View Card &amp; Send</button>
+          <button class="btn bgh bsm" onclick="dlCard('r-img','Result_'+(_lastRN||'card'))">💾 Download</button>
+        </div>
+        <a id="r-wa" href="#" target="_blank" class="bwa" style="display:none">WA</a>
       </div>
     </div>
 
     <!-- ═══ FEES ════════════════════════════════ -->
     <div id="pg-fees" class="pg">
       <div class="sh" style="background:linear-gradient(135deg,#145A32,#1A7A4A)"><h2>💳 Fee Payment Slip</h2><p>Manual entry OR select from database</p></div>
+
+      <!-- ── FEE TRACKER ── -->
+      <div class="uc" style="border:1.5px solid #A5D6A7;padding:0;overflow:hidden;margin-bottom:12px">
+        <button onclick="toggleFeeTracker()" style="width:100%;padding:12px 16px;background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;color:#1A5C35;text-align:left">
+          <span>💰 Fee Payment Tracker</span>
+          <span id="ft-arrow" style="font-size:16px;transition:transform 0.2s">▼</span>
+        </button>
+        <div id="ft-body" style="display:none;background:#fff">
+          <!-- Month selector + stats -->
+          <div style="padding:12px 14px;border-bottom:1px solid var(--gy)">
+            <div class="g2" style="margin-bottom:10px">
+              <div class="f">
+                <label>Month</label>
+                <select id="ft-month" onchange="loadFeeTracker()" style="width:100%;padding:8px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;outline:none;background:#FAFBFC">
+                  <option value="">— Select Month —</option>
+                </select>
+              </div>
+              <div class="f">
+                <label>Class Filter</label>
+                <select id="ft-cls" onchange="loadFeeTracker()">
+                  <option value="">All Classes</option>
+                </select>
+              </div>
+            </div>
+            <!-- Stats -->
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+              <div style="background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border-radius:9px;padding:9px;text-align:center;border:1px solid #A5D6A7">
+                <div style="font-size:18px;font-weight:900;color:var(--gn)" id="ft-paid-count">0</div>
+                <div style="font-size:9px;color:#1A5C35;font-weight:700">PAID</div>
+                <div style="font-size:10px;color:var(--gn);font-weight:800" id="ft-paid-amt">Rs. 0</div>
+              </div>
+              <div style="background:linear-gradient(135deg,#FFF3E0,#FFF8E1);border-radius:9px;padding:9px;text-align:center;border:1px solid #FFCC80">
+                <div style="font-size:18px;font-weight:900;color:#E65100" id="ft-pend-count">0</div>
+                <div style="font-size:9px;color:#E65100;font-weight:700">PENDING</div>
+                <div style="font-size:10px;color:#E65100;font-weight:800" id="ft-pend-amt">Rs. 0</div>
+              </div>
+              <div style="background:linear-gradient(135deg,#EBF5FF,#E8F0FF);border-radius:9px;padding:9px;text-align:center;border:1px solid #B8D4F8">
+                <div style="font-size:18px;font-weight:900;color:var(--pr)" id="ft-collect-pct">0%</div>
+                <div style="font-size:9px;color:var(--pr);font-weight:700">COLLECTED</div>
+                <div style="font-size:9px;color:var(--t2)" id="ft-total-lbl">of total</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:7px;flex-wrap:wrap">
+              <button class="btn bsm" style="background:#E65100;color:#fff;flex:1" onclick="sendPendingReminders()">📱 Remind All Pending</button>
+              <button class="btn bgh bsm" onclick="exportFeeReport()">📋 Export Report</button>
+            </div>
+          </div>
+          <!-- Table -->
+          <div id="ft-table" style="max-height:360px;overflow-y:auto">
+            <div style="padding:16px;text-align:center;color:var(--t2);font-size:12px">Select a month above to load tracker</div>
+          </div>
+        </div>
+      </div>
 
       <!-- Fee Reminder — collapsible -->
       <div class="uc" style="border:1.5px solid #FFE082;padding:0;overflow:hidden">
@@ -679,7 +828,10 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
           <div class="tpl-card" onclick="selectTemplate('fee',3,this)">
             <div class="tpl-icon">🏛️</div>
             <div class="tpl-name">Classic School</div>
-            <div class="tpl-desc">Traditional Look</div>
+          </div>
+          <div class="tpl-card" onclick="selectTemplate('fee',4,this)">
+            <div class="tpl-icon">🕌</div>
+            <div class="tpl-name">اردو</div>
           </div>
         </div>
 
@@ -740,8 +892,13 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
         </div>
         <div id="f-iw"><div class="imgwrap"><img id="f-img"/></div></div>
         <div id="f-mw" class="msgbox" style="display:none"></div>
-        <div class="shint" id="f-ht">🤖/🍎 Long-press → Save → WhatsApp ✅</div>
-        <a id="f-wa" href="#" target="_blank" class="bwa">📱 Open WhatsApp with Message</a>
+        <div class="shint" id="f-ht">View slip → message auto-opens in WhatsApp → attach slip</div>
+        <div style="display:flex;gap:7px;margin-top:6px;flex-wrap:wrap">
+          <button class="btn" style="flex:2;background:#25D366;color:#fff;border:none;border-radius:22px;padding:12px;font-size:13px;font-weight:700;cursor:pointer" onclick="showCardViewer('f-img',G('f-mw').textContent,_fPhone,'Fee_'+(_lastFN||'slip'))">👁 View Slip &amp; Send</button>
+          <button class="btn bgh bsm" onclick="dlCard('f-img','Fee_'+(_lastFN||'slip'))">💾 Download</button>
+        </div>
+        <button id="f-autosend-btn" class="btn bfw btn-pulse" style="display:none;margin-top:7px;background:linear-gradient(135deg,#1DA851,#128C3C);color:#fff" onclick="autoSendCard('f')">⚡ Auto-Send via WA API</button>
+        <a id="f-wa" href="#" target="_blank" class="bwa" style="display:none">WA</a>
       </div>
     </div>
 
@@ -797,8 +954,12 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
         </div>
         <div id="ds-iw"><div class="imgwrap"><img id="ds-img"/></div></div>
         <div id="ds-mw" class="msgbox" style="display:none"></div>
-        <div class="shint" id="ds-ht">Send to ALL parents broadcast list ✅</div>
-        <a id="ds-wa" href="#" target="_blank" class="bwa">📱 Open WhatsApp Broadcast</a>
+        <div class="shint" id="ds-ht">View datesheet → share to parents broadcast</div>
+        <div style="display:flex;gap:7px;margin-top:6px;flex-wrap:wrap">
+          <button class="btn" style="flex:2;background:#25D366;color:#fff;border:none;border-radius:22px;padding:12px;font-size:13px;font-weight:700;cursor:pointer" onclick="showCardViewer('ds-img',G('ds-mw').textContent,'','Datesheet')">👁 View &amp; Broadcast</button>
+          <button class="btn bgh bsm" onclick="dlCard('ds-img','Datesheet')">💾 Download</button>
+        </div>
+        <a id="ds-wa" href="#" target="_blank" class="bwa" style="display:none">WA</a>
       </div>
     </div>
 
@@ -829,7 +990,9 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
           <div class="f"><label>Notice Title</label><input id="n-title" placeholder="e.g. School Closed — Eid Holiday"/></div>
           <div class="f"><label>Date / Period</label><input id="n-date" placeholder="e.g. 30 March – 3 April 2026"/></div>
         </div>
-        <div class="f"><label>Notice Text</label><textarea id="n-body" placeholder="Dear Parents, School will remain closed...&#10;&#10;Write the full notice here."></textarea></div>
+        <div class="f"><label>Notice Text</label><textarea id="n-body" placeholder="Dear Parents, School will remain closed...
+
+Write the full notice here."></textarea></div>
         <div class="g2">
           <div class="f"><label>Issued by</label><input id="n-by" placeholder="Principal / Management"/></div>
           <div class="f"><label>Urgency Level</label>
@@ -849,8 +1012,12 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
         </div>
         <div id="n-iw"><div class="imgwrap"><img id="n-img"/></div></div>
         <div id="n-mw" class="msgbox" style="display:none"></div>
-        <div class="shint" id="n-ht">Send to ALL parents via broadcast ✅</div>
-        <a id="n-wa" href="#" target="_blank" class="bwa">📱 WhatsApp Broadcast</a>
+        <div class="shint" id="n-ht">View notice → share to all parents</div>
+        <div style="display:flex;gap:7px;margin-top:6px;flex-wrap:wrap">
+          <button class="btn" style="flex:2;background:#25D366;color:#fff;border:none;border-radius:22px;padding:12px;font-size:13px;font-weight:700;cursor:pointer" onclick="showCardViewer('n-img',G('n-mw').textContent,'','Notice')">👁 View &amp; Broadcast</button>
+          <button class="btn bgh bsm" onclick="dlCard('n-img','Notice')">💾 Download</button>
+        </div>
+        <a id="n-wa" href="#" target="_blank" class="bwa" style="display:none">WA</a>
       </div>
     </div>
 
@@ -893,6 +1060,30 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
         <div style="display:flex;gap:7px">
           <button class="btn bgn" style="flex:1;padding:11px" onclick="saveStudent()">💾 Save</button>
           <button class="btn bgh bsm" onclick="cancelStdForm()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- CSV Import -->
+      <div class="uc" style="border:1.5px solid #A5D6A7;margin-bottom:10px;padding:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-weight:800;color:#1A5C35;font-size:12px">📥 Bulk Import (CSV)</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn bsm" style="background:#1A5C35;color:#fff" onclick="dlCSVTemplate()">📥 Template</button>
+            <button class="btn bgn bsm" onclick="G('csv-in').click()">📤 Import</button>
+          </div>
+        </div>
+        <input type="file" id="csv-in" accept=".csv" style="display:none" onchange="handleCSV(this)"/>
+        <div id="csv-prev" style="display:none">
+          <div id="csv-info" style="background:#E8F5E9;border-radius:7px;padding:8px 11px;font-size:12px;font-weight:700;color:#1A5C35;margin-bottom:7px"></div>
+          <div id="csv-tbl" style="overflow-x:auto;max-height:180px;overflow-y:auto;border:1px solid var(--bd);border-radius:8px;margin-bottom:8px"></div>
+          <div style="display:flex;gap:7px">
+            <button class="btn bgn" style="flex:1;padding:10px" onclick="doCSVImport()">✅ Import All</button>
+            <button class="btn brd bsm" onclick="G('csv-prev').style.display='none'">Cancel</button>
+          </div>
+        </div>
+        <div id="csv-prog" style="display:none">
+          <div class="pdf-bar-wrap" style="display:block"><div class="pdf-bar" id="csv-bar2"></div></div>
+          <div id="csv-stat" style="font-size:11px;color:var(--t2);text-align:center;margin-top:5px"></div>
         </div>
       </div>
 
@@ -988,7 +1179,7 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
       <div class="uc">
         <div class="sec-lbl">👤 Account</div>
         <div style="font-size:13px;color:var(--t2);margin-bottom:11px" id="acct-email">Email: —</div>
-        <div class="f" id="api-keys-section" style="margin-bottom:12px;display:none">
+        <div class="f" id="api-keys-section" style="margin-bottom:12px;display:none;pointer-events:none;opacity:0.3">
           <div style="background:linear-gradient(135deg,#FFF8E1,#FFF3CD);border:1px solid #FFE082;border-radius:8px;padding:8px 11px;margin-bottom:10px;font-size:11px;color:#7D5A00;font-weight:600">👑 Admin Only — API Keys for AI Mark Reader</div>
           <div class="mode-tabs" style="margin-bottom:8px">
             <div style="font-size:10px;font-weight:700;color:var(--t2);padding:5px 8px;flex-shrink:0">USE:</div>
@@ -1024,14 +1215,55 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
         </div>
       </div>
 
-      <div class="uc">
-        <div class="sec-lbl">📥 Student Import Template</div>
-        <p style="font-size:12px;color:var(--t2);margin-bottom:10px;line-height:1.6">Download this CSV template → fill all student details → use the PDF/CSV importer to bulk-add students.</p>
-        <button class="btn bpr bfw" onclick="downloadCSVTemplate()">📥 Download Student Import Template (CSV)</button>
-        <p style="font-size:10px;color:var(--t2);margin-top:8px;line-height:1.6">Open in Excel or Google Sheets → fill details → save as CSV → share with us for bulk import.</p>
+      <!-- WA Business API -->
+      <div class="uc" style="border:1.5px solid #A5D6A7">
+        <div class="sec-lbl" style="color:#1A5C35">📤 WhatsApp Business API — Auto-Send</div>
+        <div style="background:#E8F5E9;border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:11px;color:#1A5C35;line-height:1.8">
+          Connect your <b>WhatsApp Business Cloud API</b> to send cards automatically — no manual forwarding.<br>
+          Get credentials free at <b>developers.facebook.com → WhatsApp → Getting Started</b>
+        </div>
+        <div class="g2">
+          <div class="f">
+            <label>Phone Number ID</label>
+            <input id="wa-phone-id" type="text" placeholder="1234567890" style="font-family:monospace"/>
+          </div>
+          <div class="f">
+            <label>Access Token</label>
+            <input id="wa-token" type="password" placeholder="EAAxxxxxxxxx..."/>
+          </div>
+        </div>
+        <div style="display:flex;gap:7px;align-items:center">
+          <button class="btn bgn bsm" onclick="saveWAKey()">💾 Save Credentials</button>
+          <button class="btn bgh bsm" onclick="testWAApi()">🧪 Test Connection</button>
+          <span id="wa-api-status" style="font-size:11px;color:var(--t2)"></span>
+        </div>
+        <div style="margin-top:10px;font-size:10px;color:var(--t2);line-height:1.8">
+          ✅ Stored locally on device only  ·  ✅ Free 1000 messages/month on Meta  ·  ✅ Works with all cards
+        </div>
       </div>
-    </div>
 
+      <!-- CSV import moved to Students section -->
+
+      <!-- ── MANAGE TEACHERS ─────────────────────── -->
+      <div class="uc" id="teachers-section" style="border:1.5px solid rgba(184,150,12,0.4)">
+        <div class="sec-lbl" style="color:#7D5A00">👥 Manage Teachers — Invite &amp; Control Access</div>
+        <p style="font-size:11px;color:var(--t2);margin-bottom:12px;line-height:1.7">Invite teachers by email. They get read-only access scoped to their assigned class. They can view students, generate diary/result cards, but cannot delete data or see fee information.</p>
+        <div style="display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap">
+          <input id="tchr-email-in" placeholder="teacher@email.com" type="email" style="flex:1;min-width:160px;padding:9px 13px;border:1.5px solid var(--bd);border-radius:9px;font-size:13px;outline:none;background:#FAFBFC"/>
+          <select id="tchr-class-in" style="padding:9px 10px;border:1.5px solid var(--bd);border-radius:9px;font-size:12px;outline:none;background:#FAFBFC">
+            <option value="">— Assign Class —</option>
+            <option>Play Group</option><option>Nursery</option><option>Prep</option>
+            <option>Class 1</option><option>Class 2</option><option>Class 3</option>
+            <option>Class 4</option><option>Class 5</option><option>Class 6</option>
+            <option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option>
+          </select>
+          <input id="tchr-name-in" placeholder="Teacher Name" style="flex:1;min-width:120px;padding:9px 13px;border:1.5px solid var(--bd);border-radius:9px;font-size:13px;outline:none;background:#FAFBFC"/>
+          <button class="btn bgn bsm" onclick="inviteTeacher()">➕ Invite</button>
+        </div>
+        <div id="tchr-list"><div style="padding:10px;text-align:center;color:var(--t2);font-size:12px">Loading teachers...</div></div>
+      </div>
+
+       </div>
     <!-- ═══ ADMIN ═════════════════════════════════ -->
     <div id="pg-admin" class="pg">
       <div class="sh" style="background:linear-gradient(135deg,#5D4000,#B8960C)"><h2>👑 Admin Panel</h2><p>Full control over all school accounts</p></div>
@@ -1068,18 +1300,268 @@ canvas{position:absolute;left:-9999px;top:-9999px;}
         <button class="btn bgh bsm" onclick="exportSchools()">📋 Export List</button>
       </div>
       <div id="admin-schools"><div class="loader"><div class="spin"></div>Loading...</div></div>
+
+      <!-- Admin API Keys section -->
+      <div class="uc" style="margin-top:14px;border:2px solid var(--ac)">
+        <div class="sec-lbl" style="color:#7D5A00">🔑 System API Keys (Admin Only)</div>
+        <div style="background:#FFF8E1;border-radius:8px;padding:8px 11px;margin-bottom:10px;font-size:11px;color:#7D5A00">These keys apply to all schools on the platform.</div>
+        <div class="g2">
+          <div class="f"><label>WA Phone Number ID</label><input id="wa-phone-id" type="text" placeholder="1234567890" style="font-family:monospace"/></div>
+          <div class="f"><label>WA Access Token</label><input id="wa-token" type="password" placeholder="EAAxxxxxxxx"/></div>
+        </div>
+        <div class="f"><label>Mistral AI Key (mistral.ai/console)</label><input id="mistral-key" type="password" placeholder="sk-..."/></div>
+        <div class="f"><label>Anthropic Claude Key (for OCR)</label><input id="anthropic-key" type="password" placeholder="sk-ant-..."/></div>
+        <div class="f"><label>Google Vision Key</label><input id="google-vision-key" type="password" placeholder="AIza..."/></div>
+        <div style="margin-bottom:8px">
+          <select id="ocr-provider" style="width:100%;padding:8px;border:1.5px solid var(--bd);border-radius:8px;font-size:12px;outline:none">
+            <option value="anthropic">🤖 Use Claude for OCR</option>
+            <option value="google">🔍 Use Google Vision for OCR</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">
+          <button class="btn bgn bsm" onclick="saveAllAdminKeys()">💾 Save All Keys</button>
+          <button class="btn bgh bsm" onclick="testWAApi()">🧪 Test WA API</button>
+          <span id="wa-api-status" style="font-size:11px;color:var(--t2)"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ATTENDANCE ════════════════════════════════ -->
+    <div id="pg-attend" class="pg">
+      <div class="sh" style="background:linear-gradient(135deg,#1A3A6B,#0D2D5E)">
+        <h2>📋 Daily Attendance</h2>
+        <p>Mark present/absent → generate card → auto-notify absent parents</p>
+      </div>
+
+      <!-- Controls -->
+      <div class="uc">
+        <div class="g2">
+          <div class="f">
+            <label>Class</label>
+            <select id="att-cls" onchange="loadAttendanceStudents()">
+              <option value="">— Select Class —</option>
+            </select>
+          </div>
+          <div class="f">
+            <label>Date</label>
+            <input id="att-date" type="date" onchange="loadAttendanceStudents()"/>
+          </div>
+        </div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <button class="btn bgn bsm" onclick="markAllPresent()">✅ All Present</button>
+          <button class="btn brd bsm" onclick="markAllAbsent()">❌ All Absent</button>
+          <button class="btn bpr bsm" onclick="loadAttendanceStudents()">🔄 Reload</button>
+        </div>
+      </div>
+
+      <!-- Stats bar -->
+      <div class="att-stats" id="att-stats" style="display:none">
+        <div class="att-stat"><div class="num" id="att-p-count">0</div><div class="lbl">Present</div></div>
+        <div class="att-stat"><div class="num" id="att-a-count">0</div><div class="lbl">Absent</div></div>
+        <div class="att-stat"><div class="num" id="att-pct">—</div><div class="lbl">% Present</div></div>
+      </div>
+
+      <!-- Student list -->
+      <div id="att-list" class="uc" style="display:none;padding:0;overflow:hidden">
+        <div id="att-rows"></div>
+      </div>
+
+      <!-- Actions -->
+      <div id="att-actions" style="display:none">
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <button id="att-tpl-en" class="btn bpr bsm" style="flex:1" onclick="ATT_TPL=1;updateAttTplBtns()">🇬🇧 English</button>
+          <button id="att-tpl-ur" class="btn bgh bsm" style="flex:1" onclick="ATT_TPL=2;updateAttTplBtns()">🕌 اردو</button>
+        </div>
+        <button class="btn bpr bfw btn-pulse" style="margin-bottom:8px" onclick="saveAndGenAttendance()">📸 Save & Generate Card</button>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <button class="btn bsm" style="flex:1;background:#E65100;color:#fff" onclick="notifyAbsentParents()">📱 Notify Absent Parents</button>
+          <button class="btn bgh bsm" onclick="exportAttendanceCSV()">📋 Export CSV</button>
+        </div>
+      </div>
+
+      <!-- Output -->
+      <div id="att-out" class="obox" style="display:none">
+        <div class="otabs">
+          <button class="otab on" onclick="swO('att','i',this)">🖼 Card</button>
+          <button class="otab" onclick="swO('att','m',this)">💬 Message</button>
+        </div>
+        <div id="att-iw"><div class="imgwrap"><img id="att-img"/></div></div>
+        <div id="att-mw" class="msgbox" style="display:none"></div>
+        <div class="shint">View card fullscreen → copy message → share</div>
+        <button class="btn bfw" style="background:#25D366;color:#fff;border:none;border-radius:22px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;margin-top:6px" onclick="showCardViewer('att-img',G('att-mw').textContent,'','Attendance')">👁 View Card &amp; Share</button>
+        <a id="att-wa" href="#" target="_blank" class="bwa" style="display:none">WA</a>
+      </div>
+    </div>
+
+
+    <!-- ═══ TIMETABLE GENERATOR ══════════════ -->
+    <div id="pg-timetable" class="pg">
+      <div class="sh" style="background:linear-gradient(135deg,#1A5276,#2E86C1)"><h2>📅 Timetable Generator</h2><p>Weekly class schedule — print or share</p></div>
+      <div class="uc">
+        <div class="g2">
+          <div class="f"><label>Class</label><input id="tt-class" placeholder="e.g. Class 6-A"/></div>
+          <div class="f"><label>Academic Year</label><input id="tt-year" value="2025-26"/></div>
+        </div>
+        <div class="f"><label>Teacher / Prepared By</label><input id="tt-teacher" placeholder="Ms. Ayesha"/></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0 5px">
+          <div style="font-weight:700;color:var(--pr);font-size:11px;text-transform:uppercase">📚 Periods</div>
+          <button class="btn bgh bsm" onclick="addTTRow()">+ Row</button>
+        </div>
+        <div style="display:grid;grid-template-columns:55px 1fr 1fr 1fr 1fr 1fr 24px;gap:3px;font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;margin-bottom:3px;padding:0 2px">
+          <span>Period</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span></span>
+        </div>
+        <div id="tt-rows"></div>
+        <div class="tpl-grid" style="margin-top:10px">
+          <div class="tpl-card on" onclick="selectTemplate('tt',1,this)"><div class="tpl-icon">🎯</div><div class="tpl-name">Minimal</div></div>
+          <div class="tpl-card" onclick="selectTemplate('tt',2,this)"><div class="tpl-icon">✨</div><div class="tpl-name">Elegant</div></div>
+          <div class="tpl-card" onclick="selectTemplate('tt',3,this)"><div class="tpl-icon">🏛️</div><div class="tpl-name">Classic</div></div>
+        </div>
+        <button class="btn bpr bfw btn-pulse" style="margin-top:8px" onclick="genTimetable()">📸 Generate Timetable</button>
+      </div>
+      <div id="tt-out" class="obox" style="display:none">
+        <div class="imgwrap"><img id="tt-img"/></div>
+        <div style="display:flex;gap:7px;margin-top:7px">
+          <button class="btn" style="flex:2;background:#25D366;color:#fff;border:none;border-radius:22px;padding:12px;font-size:13px;font-weight:700;cursor:pointer" onclick="showCardViewer('tt-img','','','Timetable_'+(G('tt-class').value||'class'))">👁 View &amp; Share</button>
+          <button class="btn bgh bsm" onclick="dlCard('tt-img','Timetable')">💾 Download</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PRINCIPAL DASHBOARD ═══════════════ -->
+    <div id="pg-dashboard" class="pg">
+      <div class="sh"><h2>📊 Dashboard</h2><p>School overview at a glance</p></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px">
+        <div class="uc" style="text-align:center;padding:18px 10px;background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border:1px solid #A5D6A7">
+          <div style="font-size:34px;font-weight:900;color:var(--gn)" id="db-students">—</div>
+          <div style="font-size:10px;font-weight:700;color:#1A5C35;text-transform:uppercase;margin-top:3px">Students</div>
+        </div>
+        <div class="uc" style="text-align:center;padding:18px 10px;background:linear-gradient(135deg,#EBF5FF,#E8F0FF);border:1px solid #B8D4F8">
+          <div style="font-size:34px;font-weight:900;color:var(--pr)" id="db-classes">—</div>
+          <div style="font-size:10px;font-weight:700;color:var(--pr);text-transform:uppercase;margin-top:3px">Classes</div>
+        </div>
+        <div class="uc" style="text-align:center;padding:18px 10px;background:linear-gradient(135deg,#FFF3E0,#FFF8E1);border:1px solid #FFCC80">
+          <div style="font-size:34px;font-weight:900;color:#E65100" id="db-pending">—</div>
+          <div style="font-size:10px;font-weight:700;color:#E65100;text-transform:uppercase;margin-top:3px">Fee Pending</div>
+        </div>
+        <div class="uc" style="text-align:center;padding:18px 10px;background:linear-gradient(135deg,#F3E5F5,#EDE7F6);border:1px solid #CE93D8">
+          <div style="font-size:34px;font-weight:900;color:#6A1B9A" id="db-teachers">—</div>
+          <div style="font-size:10px;font-weight:700;color:#6A1B9A;text-transform:uppercase;margin-top:3px">Teachers</div>
+        </div>
+      </div>
+      <div class="uc" style="background:linear-gradient(135deg,var(--pr),var(--pl))">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:10px;color:#ffffff66;text-transform:uppercase">Plan</div>
+            <div style="font-size:20px;font-weight:900;color:#fff" id="db-plan">TRIAL</div>
+            <div style="font-size:11px;color:#ffffff66" id="db-exp">—</div>
+          </div>
+          <a href="https://wa.me/923057516400?text=Upgrade+Classcard" target="_blank" class="btn bac" style="text-decoration:none;padding:9px 14px">📱 Upgrade</a>
+        </div>
+      </div>
+      <div class="uc" style="margin-top:12px">
+        <div class="sec-lbl">⚡ Quick Actions</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn bpr bsm" onclick="navTo('attend',G('qnav-attend'))">📋 Attendance</button>
+          <button class="btn bpr bsm" onclick="navTo('diary',G('qnav-diary'))">📝 Diary</button>
+          <button class="btn bpr bsm" onclick="navTo('results',G('qnav-results'))">📊 Results</button>
+          <button class="btn bpr bsm" onclick="navTo('fees',G('qnav-fees'))">💳 Fees</button>
+        </div>
+      </div>
+      <div class="uc" style="margin-top:12px">
+        <div class="sec-lbl">🏫 Students by Class</div>
+        <div id="db-breakdown" style="font-size:12px;color:var(--t2)">Loading...</div>
+      </div>
     </div>
 
   </div><!-- /pwrap -->
 
   <div class="bnav" id="bnav">
-    <button class="nbtn on" onclick="navTo('diary',this)"><span class="ni">📝</span>Diary</button>
-    <button class="nbtn" onclick="navTo('results',this)"><span class="ni">📊</span>Results</button>
-    <button class="nbtn" onclick="navTo('fees',this)"><span class="ni">💳</span>Fees</button>
-    <button class="nbtn" onclick="navTo('ds',this)"><span class="ni">📅</span>Schedule</button>
-    <button class="nbtn" onclick="navTo('notice',this)"><span class="ni">📢</span>Notice</button>
-    <button class="nbtn" onclick="navTo('students',this)"><span class="ni">🎓</span>Students</button>
-    <button class="nbtn" onclick="navTo('settings',this)"><span class="ni">⚙️</span>Settings</button>
+    <button class="nbtn on" id="qnav-attend" onclick="navTo('attend',this)"><span class="ni">📋</span>Attend</button>
+    <button class="nbtn" id="qnav-diary" onclick="navTo('diary',this)"><span class="ni">📝</span>Diary</button>
+    <button class="nbtn" id="qnav-results" onclick="navTo('results',this)"><span class="ni">📊</span>Results</button>
+    <button class="nbtn" id="qnav-fees" onclick="navTo('fees',this)"><span class="ni">💳</span>Fees</button>
+    <button class="nbtn nbtn-menu" onclick="openSB()"><span class="ni">☰</span>Menu</button>
+  </div>
+</div>
+
+<!-- SIDEBAR OVERLAY -->
+<div id="sb-ov" onclick="closeSB()"></div>
+
+<!-- SIDEBAR DRAWER -->
+<div id="sidebar">
+  <div class="sb-hd">
+    <div class="sb-hd-logo" id="sb-logo-init">CC</div>
+    <div class="sb-hd-info">
+      <h3 id="sb-school-nm">School</h3>
+      <p id="sb-role-lbl">Principal</p>
+    </div>
+    <button id="sb-close" onclick="closeSB()">✕</button>
+  </div>
+
+  <div id="sb-role-badge" style="display:none"></div>
+
+  <div class="sb-body">
+
+    <!-- DIARY -->
+    <div class="sb-sec">
+      <button class="sb-trig" onclick="sbToggle('sb-diary',this)">📓 Diary <span class="arr">▼</span></button>
+      <div id="sb-diary" class="sb-sub">
+        <div class="sb-item" onclick="sbNav('diary')">📋 Attendance</div>
+        <div class="sb-item" onclick="sbNav('diary2')">📝 Daily Diary</div>
+      </div>
+    </div>
+
+    <!-- FEE — hidden for teachers -->
+    <div class="sb-sec" id="sb-fee-sec">
+      <button class="sb-trig" onclick="sbToggle('sb-fee',this)">💰 Fee <span class="arr">▼</span></button>
+      <div id="sb-fee" class="sb-sub">
+        <div class="sb-item" onclick="sbNav('fees')">📊 Fee Tracker / Voucher</div>
+      </div>
+    </div>
+
+    <!-- EXAMINATION -->
+    <div class="sb-sec">
+      <button class="sb-trig" onclick="sbToggle('sb-exam',this)">📝 Examination <span class="arr">▼</span></button>
+      <div id="sb-exam" class="sb-sub">
+        <div class="sb-item" onclick="sbNav('results')">📊 Results Entry</div>
+        <div class="sb-item" onclick="sbNav('ds')">📅 Datesheet / Schedule</div>
+      </div>
+    </div>
+
+    <!-- OTHERS -->
+    <div class="sb-sec">
+      <button class="sb-trig" onclick="sbToggle('sb-others',this)">⚙️ Others <span class="arr">▼</span></button>
+      <div id="sb-others" class="sb-sub">
+        <div class="sb-item" onclick="sbNav('notice')">📢 Notice Board</div>
+        <div class="sb-item" onclick="sbNav('students')">🎓 Students</div>
+        <div class="sb-item" onclick="sbNav('timetable')">📅 Timetable</div>
+      </div>
+    </div>
+
+    <!-- SETTINGS — hidden for teachers -->
+    <div class="sb-sec" id="sb-settings-sec">
+      <button class="sb-trig" onclick="sbToggle('sb-settings',this)">🛠 Settings <span class="arr">▼</span></button>
+      <div id="sb-settings" class="sb-sub">
+        <div class="sb-item" onclick="sbNav('settings')">🎨 Branding</div>
+        <div class="sb-item" onclick="sbNav('settings');setTimeout(function(){G('teachers-section').scrollIntoView({behavior:'smooth'});},300)">👥 Manage Teachers</div>
+        <div class="sb-item" onclick="sbNav('settings');setTimeout(function(){G('settings-support').scrollIntoView({behavior:'smooth'});},300)">💬 Support</div>
+      </div>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <!-- ADMIN — admin only -->
+    <div class="sb-sec" id="sb-admin-sec" style="display:none">
+      <button class="sb-trig" style="color:#FF7B7B" onclick="sbToggle('sb-admin',this)">🛡 Admin Panel <span class="arr">▼</span></button>
+      <div id="sb-admin" class="sb-sub">
+        <div class="sb-item" onclick="sbNav('admin')">📊 Admin Dashboard</div>
+      </div>
+    </div>
+
+  </div><!-- /sb-body -->
+
+  <div class="sb-ft">
+    <button class="sb-signout" onclick="doLogout()">🚪 Sign Out</button>
   </div>
 </div>
 
@@ -1140,6 +1622,11 @@ function handleLogoUpload(input) {
     preview.src = SCHOOL_LOGO;
     preview.style.display = 'block';
     G('logo-upload').classList.add('has-logo');
+        // Update header logo immediately
+    var hImg=G('app-logo-img'),hInit=G('app-logo-initials');
+    if(hImg){hImg.src=SCHOOL_LOGO;hImg.style.display='block';}
+    if(hInit) hInit.style.display='none';
+
     G('clear-logo-btn').style.display = 'inline-block';
     toast('Logo uploaded ✅');
     
@@ -1155,6 +1642,11 @@ function clearLogo() {
   SCHOOL_LOGO = null;
   G('logo-preview').style.display = 'none';
   G('logo-upload').classList.remove('has-logo');
+    // Reset header logo
+  var hImg=G('app-logo-img'),hInit=G('app-logo-initials');
+  if(hImg) hImg.style.display='none';
+  if(hInit){hInit.style.display='flex';if(G("app-school-name"))hInit.textContent=G("app-school-name").textContent.substring(0,2).toUpperCase();}
+
   G('clear-logo-btn').style.display = 'none';
   G('logo-input').value = '';
   try {
@@ -1250,7 +1742,7 @@ function updatePendingCount() {
 }
 
 // ══ FIREBASE ══════════════════════════════════════════
-var db,auth,CU,CSD,isAdmin=false,STUDENTS=[],appStarted=false;
+var db,auth,CU,CSD,isAdmin=false,STUDENTS=[],appStarted=false,CU_ROLE="principal",CU_CLASS="";
 try{
   firebase.initializeApp(CFG.firebase);
   db=firebase.firestore();auth=firebase.auth();
@@ -1341,6 +1833,7 @@ function genRManual(){
   var max=mks.reduce(function(a,m){return a+Number(m.of||100);},0);
   var pct=max?Math.round(tot/max*100):0,grade=gr(pct);
   var fakeS={nm:nm,cl:cl||"—",sec:"",rl:G("r-mrl").value.trim(),fn:G("r-mfn").value.trim(),ph:G("r-mwa").value.trim()};
+  _lastRN=nm;_rPhone=fakeS.ph||'';
   var tpl=TEMPLATES.result;
   if(tpl===1) drawResultTemplate1(fakeS,mks,title,year,rmk,tot,max,pct,grade);
   else if(tpl===2) drawResultTemplate2(fakeS,mks,title,year,rmk,tot,max,pct,grade);
@@ -1376,6 +1869,7 @@ function loadApiKey(){
 // ══ OCR MARK SHEET READER ═════════════════════════════════
 var OCR_DATA = null;
 function handleOCR(input){
+  if(!requirePro("AI Mark Sheet Reader")){input.value="";return;}
   var file=input.files[0];if(!file)return;
   if(!ANTHROPIC_KEY&&!GOOGLE_VISION_KEY){toast("Set API key in Settings first (admin only).");return;}
   var reader=new FileReader();
@@ -1724,48 +2218,6 @@ function genFeeReminder(){
 }
 
 
-
-// ══ QUICK DIARY ═══════════════════════════════════════════
-function quickDiary(){
-  // Pre-fill today's date in masked input
-  var d=new Date();
-  var dd=String(d.getDate()).padStart(2,"0");
-  var mm=String(d.getMonth()+1).padStart(2,"0");
-  var yy=String(d.getFullYear()).slice(-2);
-  if(G("d-date-mask"))G("d-date-mask").value=dd+"-"+mm+"-"+yy;
-  // Scroll to diary and focus class field
-  navTo("diary",document.querySelector(".nbtn"));
-  setTimeout(function(){if(G("d-class"))G("d-class").focus();},300);
-  toast("⚡ Quick Diary ready — enter class and fill homework!");
-}
-
-// ══ DATE MASK — DD-MM-YY with auto-jump ══════════════════
-function dateMask(el){
-  var v=el.value.replace(/[^0-9]/g,"");
-  var out="";
-  if(v.length>0)out+=v.substring(0,2);
-  if(v.length>=3)out+="-"+v.substring(2,4);
-  if(v.length>=5)out+="-"+v.substring(4,6);
-  el.value=out;
-}
-
-// ══ GET DATE FROM MASK ═══════════════════════════════════
-function getMaskedDate(){
-  var el=G("d-date-mask");
-  if(!el)return td();
-  var v=el.value.trim();
-  if(!v)return td();
-  // Format: DD-MM-YY → readable
-  var parts=v.split("-");
-  if(parts.length===3){
-    var months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    var m=parseInt(parts[1]);
-    var mo=months[m-1]||parts[1];
-    return parts[0]+" "+mo+" 20"+parts[2];
-  }
-  return v;
-}
-
 // ══ COPY MSG TO CLIPBOARD ════════════════════════════════
 function copyMsg(elId){
   var el=G(elId);if(!el)return;
@@ -1883,6 +2335,102 @@ function setStudentLimit(uid,limit){
   });
 }
 
+// ══ CSV IMPORTER — full browser-based ════════════════════
+var _csvParsed = []; // holds parsed student rows
+
+function handleCSVImport(input){
+  var file = input.files[0]; if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var text = e.target.result;
+    var rows = text.split("\n").map(function(r){ return r.trim(); }).filter(Boolean);
+    if(rows.length < 2){ toast("CSV is empty or invalid."); return; }
+    var headers = rows[0].split(",").map(function(h){ return h.trim().replace(/"/g,""); });
+    // Expected: Full Name, Roll No, Class, Section, Monthly Fee, Father Name, Parent WhatsApp, Parent Name
+    var students = [];
+    for(var i=1;i<rows.length;i++){
+      var cols = rows[i].split(",").map(function(v){ return v.trim().replace(/"/g,""); });
+      if(!cols[0]||cols[0].startsWith("(")) continue; // skip blank/comment rows
+      students.push({
+        nm: cols[0]||"",
+        rl: cols[1]||"",
+        cl: cols[2]||"Class 1",
+        sec: cols[3]||"",
+        fe: Number(cols[4])||1000,
+        fn: cols[5]||"",
+        ph: cols[6]||"",
+        pr: cols[7]||""
+      });
+    }
+    if(!students.length){ toast("No valid students found in CSV."); return; }
+    _csvParsed = students;
+    showCSVPreview(students, headers);
+  };
+  reader.readAsText(file);
+  input.value = "";
+}
+
+function showCSVPreview(students, headers){
+  G("csv-preview-area").style.display = "block";
+  G("csv-preview-info").textContent = "✅ Found " + students.length + " students — review before importing:";
+  var tbl = '<table style="width:100%;border-collapse:collapse">';
+  tbl += '<thead><tr style="background:var(--pr);color:#fff">';
+  ["Name","Roll","Class","Section","Fee","Father","WhatsApp"].forEach(function(h){
+    tbl += '<th style="padding:6px 8px;font-size:10px;white-space:nowrap">'+h+'</th>';
+  });
+  tbl += '</tr></thead><tbody>';
+  students.slice(0,20).forEach(function(s,i){
+    var bg = i%2===0?"#fff":"#F8FAFF";
+    tbl += '<tr style="background:'+bg+'">';
+    [s.nm,s.rl,s.cl,s.sec,s.fe,s.fn,s.ph].forEach(function(v){
+      tbl += '<td style="padding:5px 8px;font-size:11px;border-bottom:1px solid var(--gy)">'+v+'</td>';
+    });
+    tbl += "</tr>";
+  });
+  if(students.length > 20) tbl += '<tr><td colspan="7" style="padding:8px;text-align:center;font-size:11px;color:var(--t2)">... and '+(students.length-20)+' more</td></tr>';
+  tbl += "</tbody></table>";
+  G("csv-preview-table").innerHTML = tbl;
+}
+
+function cancelCSVImport(){
+  _csvParsed = [];
+  G("csv-preview-area").style.display = "none";
+}
+
+function confirmCSVImport(){
+  if(!_csvParsed.length){ toast("No students to import."); return; }
+  if(!CU){ toast("Not logged in."); return; }
+  G("csv-preview-area").style.display = "none";
+  G("csv-import-progress").style.display = "block";
+  var total = _csvParsed.length;
+  var done = 0;
+  var ref = db.collection("schools").doc(CU.uid).collection("students");
+  var batch = db.batch();
+  _csvParsed.forEach(function(s){
+    var docRef = ref.doc();
+    batch.set(docRef, Object.assign(s, {
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }));
+  });
+  G("csv-bar").style.width = "30%";
+  G("csv-import-status").textContent = "Importing " + total + " students...";
+  batch.commit().then(function(){
+    G("csv-bar").style.width = "100%";
+    G("csv-import-status").textContent = "✅ " + total + " students imported!";
+    db.collection("schools").doc(CU.uid).update({studentCount: firebase.firestore.FieldValue.increment(total)});
+    _csvParsed = [];
+    setTimeout(function(){
+      G("csv-import-progress").style.display = "none";
+      G("csv-bar").style.width = "0%";
+      toast("✅ " + total + " students imported successfully!");
+    }, 2000);
+  }).catch(function(e){
+    G("csv-import-status").textContent = "❌ Error: " + e.message;
+  });
+}
+
+
 // ══ AUTH ══════════════════════════════════════════════
 function switchTab(tab,btn){
   document.querySelectorAll(".atab").forEach(function(b){b.classList.remove("on");});
@@ -1932,7 +2480,7 @@ function doSignup(){
     .catch(function(e){showErr(e.message);});
 }
 function doLogout(){
-  if(auth)auth.signOut().then(function(){G("auth-screen").style.display="flex";G("app-screen").style.display="none";STUDENTS=[];appStarted=false;isAdmin=false;var a=G("admin-nav-btn");if(a)a.remove();});
+  if(auth)auth.signOut().then(function(){G("auth-screen").style.display="flex";G("app-screen").style.display="none";STUDENTS=[];appStarted=false;isAdmin=false;CU_ROLE="principal";CU_CLASS="";closeSB();var a=G("admin-nav-btn");if(a)a.remove();});
 }
 
 // ══ SCHOOL DATA ════════════════════════════════════════
@@ -1942,14 +2490,25 @@ function loadSchoolData(user){
     .then(function(doc){
       if(doc.exists){CSD=doc.data();applySD(CSD);loadStudents(user.uid);checkSub(CSD);}
       else{CSD={name:"My School",plan:"trial",planExpiry:trialExp(),branding:SC};db.collection("schools").doc(user.uid).set(CSD);applySD(CSD);loadStudents(user.uid);}
-      showApp();loadGlobalNotice();loadLogo();loadApiKey();
-    }).catch(function(){showApp();loadStudentsLocal(user.uid);loadLogo();loadApiKey();});
+      showApp();loadGlobalNotice();loadLogo();
+    }).catch(function(){showApp();loadStudentsLocal(user.uid);loadLogo();});
 }
 function trialExp(){var d=new Date();d.setDate(d.getDate()+14);return d.toISOString();}
 function applySD(data){
   if(data.branding){Object.assign(SC,data.branding);var f={nm1:SC.nm1,nm2:SC.nm2,addr:SC.addr||"",ph:SC.ph||"",email:SC.email||"",web:SC.web||""};Object.keys(f).forEach(function(k){if(G("b-"+k))G("b-"+k).value=f[k];});if(G("b-pc"))G("b-pc").value=SC.pc;if(G("b-pc-h"))G("b-pc-h").value=SC.pc;if(G("b-ac"))G("b-ac").value=SC.ac;if(G("b-ac-h"))G("b-ac-h").value=SC.ac;if(G("b-watermark"))G("b-watermark").checked=SC.watermark||false;if(G("b-wm-text")&&SC.wmText)G("b-wm-text").value=SC.wmText;}
   var name=data.name||SC.nm1+" "+SC.nm2;
-  G("app-school-name").textContent=name;G("app-logo").textContent=name.substring(0,2).toUpperCase();
+   G("app-school-name").textContent=name;
+  // Show school logo in header if uploaded, else show initials
+  var logoImg=G("app-logo-img");
+  var logoInitials=G("app-logo-initials");
+  if(SCHOOL_LOGO && logoImg){
+    logoImg.src=SCHOOL_LOGO; logoImg.style.display="block";
+    if(logoInitials) logoInitials.style.display="none";
+  } else {
+    if(logoImg) logoImg.style.display="none";
+    if(logoInitials) logoInitials.textContent=name.substring(0,2).toUpperCase();
+  }
+
   G("acct-email").textContent="Email: "+(CU?CU.email:"");
   var pl=data.plan||"trial",po=CFG.plans[pl]||CFG.plans.trial;
   var exp=data.planExpiry?new Date(data.planExpiry).toLocaleDateString("en-PK",{day:"numeric",month:"short",year:"numeric"}):"—";
@@ -1968,17 +2527,121 @@ function dismissN(){G("nbanner").style.display="none";try{if(window._nid)localSt
 function pushNotice(){var t=G("admin-notice-txt").value.trim();if(!t){toast("Enter notice text.");return;}var id=Date.now().toString();db.collection("global").doc("notice").set({text:t,id:id,updatedAt:new Date().toISOString()}).then(function(){toast("Pushed to all schools ✅");G("admin-notice-txt").value="";});}
 function clearNotice(){db.collection("global").doc("notice").set({text:"",id:"",updatedAt:new Date().toISOString()}).then(function(){toast("Notice cleared");});}
 
-function showApp(){
+// showApp defined above
+function _showApp_old_unused(){
   if(appStarted)return;appStarted=true;
-  G("splash").classList.add("hide");setTimeout(function(){G("splash").style.display="none";},400);
-  G("auth-screen").style.display="none";G("app-screen").style.display="flex";
   if(isAdmin){
-    if(!G("admin-nav-btn")){var b=document.createElement("button");b.className="nbtn";b.id="admin-nav-btn";b.innerHTML='<span class="ni">👑</span>Admin';b.onclick=function(){navTo("admin",this);};G("bnav").appendChild(b);}
-    // Show API keys section only for admin
+    var aS=G("sb-admin-sec");if(aS)aS.style.display="block";
+    var rB=G("sb-role-badge");if(rB){rB.className="sb-role admin-r";rB.textContent="👑 Admin / Founder";rB.style.display="block";}
     if(G("api-keys-section"))G("api-keys-section").style.display="block";
     showAdminOCRNote();
+  } else if(CU_ROLE==="teacher"){
+    // Teacher: hide fee + settings from sidebar
+    var fS=G("sb-fee-sec");if(fS)fS.style.display="none";
+    var sS=G("sb-settings-sec");if(sS)sS.style.display="none";
+    // Teacher banner
+    var tb=G("tchr-banner");if(tb)tb.style.display="flex";
+    var tl=G("tchr-class-lbl");if(tl&&CU_CLASS)tl.textContent=CU_CLASS;
+    // Teacher badge
+    var rB=G("sb-role-badge");if(rB){rB.className="sb-role teacher-r";rB.textContent="🏫 Teacher — "+( CU_CLASS||"");rB.style.display="block";}
+    // Lock fee & settings nav
+    var qf=G("qnav-fees");if(qf){qf.style.opacity="0.3";qf.style.pointerEvents="none";}
+  } else {
+    // Principal
+    var rB=G("sb-role-badge");if(rB){rB.className="sb-role principal-r";rB.textContent="🏫 Principal";rB.style.display="block";}
+  }
+  // Update sidebar school name
+  if(CSD){
+    var sn=G("sb-school-nm");if(sn)sn.textContent=CSD.name||"School";
+    var li=G("sb-logo-init");if(li)li.textContent=(CSD.name||"SC").substring(0,2).toUpperCase();
+    var rl=G("sb-role-lbl");if(rl)rl.textContent=isAdmin?"Admin":CU_ROLE==="teacher"?"Teacher":"Principal";
   }
   initForms();
+  loadTeachers();
+}
+
+// ── SIDEBAR FUNCTIONS ──────────────────────────────
+function openSB(){var o=G("sb-ov"),s=G("sidebar");if(o)o.classList.add("open");if(s)s.classList.add("open");}
+function closeSB(){var o=G("sb-ov"),s=G("sidebar");if(o)o.classList.remove("open");if(s)s.classList.remove("open");}
+function sbToggle(id,btn){
+  var el=G(id);if(!el)return;
+  var isOpen=el.classList.contains("open");
+  // Close all subs
+  document.querySelectorAll(".sb-sub.open").forEach(function(s){s.classList.remove("open");});
+  document.querySelectorAll(".sb-trig.open").forEach(function(b){b.classList.remove("open");});
+  if(!isOpen){el.classList.add("open");if(btn)btn.classList.add("open");}
+}
+function sbNav(id){
+  closeSB();
+  setTimeout(function(){
+    var fakeBtn=null;
+    // map diary sub-items
+    if(id==="diary")navTo("attend",G("qnav-attend"));
+    else if(id==="diary2")navTo("diary",G("qnav-diary"));
+    else navTo(id,null);
+    // highlight correct bottom btn if matching
+    var map={"diary":"qnav-diary","attend":"qnav-attend","results":"qnav-results","fees":"qnav-fees"};
+    document.querySelectorAll(".nbtn").forEach(function(b){b.classList.remove("on");});
+    if(map[id])G(map[id]).classList.add("on");
+  },180);
+}
+
+// ── TEACHER INVITE ─────────────────────────────────
+var CU_ROLE="principal",CU_CLASS="";
+
+function inviteTeacher(){
+  if(!CU){toast("Not logged in.");return;}
+  var email=G("tchr-email-in").value.trim().toLowerCase();
+  var cls=G("tchr-class-in").value;
+  var name=G("tchr-name-in").value.trim();
+  if(!email||!cls||!name){toast("Fill email, name, and class.");return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){toast("Invalid email.");return;}
+  var ref=db.collection("schools").doc(CU.uid).collection("teachers").doc(email);
+  ref.set({email:email,name:name,assignedClass:cls,addedAt:new Date().toISOString(),active:true})
+    .then(function(){toast("Teacher invited ✅ — they sign up with this email");G("tchr-email-in").value="";G("tchr-name-in").value="";G("tchr-class-in").value="";loadTeachers();})
+    .catch(function(e){toast("Error: "+e.message);});
+}
+
+function loadTeachers(){
+  if(!CU||CU_ROLE==="teacher")return;
+  var el=G("tchr-list");if(!el)return;
+  db.collection("schools").doc(CU.uid).collection("teachers").get()
+    .then(function(snap){
+      if(snap.empty){el.innerHTML='<div style="padding:12px;text-align:center;color:var(--t2);font-size:12px">No teachers invited yet. Add one above.</div>';return;}
+      var html='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">'
+        +'<tr style="background:var(--pr);color:#fff"><th style="padding:8px 10px;text-align:left">Name</th><th style="padding:8px 10px;text-align:left">Email</th><th style="padding:8px;text-align:left">Class</th><th style="padding:8px">Action</th></tr>';
+      snap.forEach(function(doc){
+        var d=doc.data();
+        html+='<tr style="border-bottom:1px solid var(--bd);background:'+(d.active?"#fff":"#FFF3F3")+'">'
+          +'<td style="padding:8px 10px;font-weight:600">'+d.name+'</td>'
+          +'<td style="padding:8px 10px;color:var(--t2)">'+d.email+'</td>'
+          +'<td style="padding:8px 10px"><span style="background:rgba(13,27,75,0.1);padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700">'+d.assignedClass+'</span></td>'
+          +'<td style="padding:8px;text-align:center"><button onclick="removeTeacher(\''+doc.id+'\')" style="background:#FDEDEC;color:var(--rd);border:1px solid #FADBD8;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700">Remove</button></td>'
+          +'</tr>';
+      });
+      html+='</table></div>';
+      el.innerHTML=html;
+    }).catch(function(){});
+}
+
+function removeTeacher(email){
+  if(!confirm("Remove this teacher?"))return;
+  db.collection("schools").doc(CU.uid).collection("teachers").doc(email).delete()
+    .then(function(){toast("Teacher removed");loadTeachers();}).catch(function(e){toast(e.message);});
+}
+
+// ══ PLAN GATING ════════════════════════════════════════
+function isPro(){
+  if(!CSD)return false;
+  var p=CSD.plan||"trial";
+  if(p==="auto"||p==="auto6"||p==="auto12")return true;
+  if(p==="trial"&&CSD.planExpiry&&new Date(CSD.planExpiry)>new Date())return true;
+  return false;
+}
+function requirePro(feat){
+  if(isPro())return true;
+  toast("🔒 "+feat+" requires Auto Pro. Contact us: wa.me/923057516400");
+  return false;
 }
 
 // ══ STUDENTS ══════════════════════════════════════════
@@ -2029,17 +2692,8 @@ function renderStdTable(list){
 function searchStd(){var q=G("std-srch").value.toLowerCase();renderStdTable(q?STUDENTS.filter(function(s){return s.nm.toLowerCase().includes(q)||s.rl.includes(q)||s.cl.toLowerCase().includes(q);}):null);}
 
 // ══ NAVIGATION ════════════════════════════════════════
-function navTo(id,btn){
-  document.querySelectorAll(".pg").forEach(function(p){p.classList.remove("on");});
-  document.querySelectorAll(".nbtn").forEach(function(b){b.classList.remove("on");});
-  G("pg-"+id).classList.add("on");if(btn)btn.classList.add("on");
-  if(id==="diary")initDiary();if(id==="results")initRes();if(id==="fees")initFees();
-  if(id==="ds")initDS();if(id==="settings")lpv();if(id==="admin")loadAdminPanel();
-}
-function refreshDrops(){
-  var cls=clsList();
-  ["r-cls","f-cls"].forEach(function(id){var el=G(id);if(!el)return;var cur=el.value;el.innerHTML='<option value="">All Classes</option>';cls.forEach(function(c){var o=document.createElement("option");o.value=c;o.text=c;el.add(o);});if(cur)el.value=cur;});
-}
+// navTo defined above
+// refreshDrops defined above
 function initForms(){buildDateDrop();initFees();initDS();renderHW();renderSubs();}
 
 function fS(pre){
@@ -2076,7 +2730,6 @@ function renderHW(){
   var tb=G("hw-tbody");tb.innerHTML="";var d=tds();
   HWR.forEach(function(r,i){
     tb.innerHTML+='<tr>'+
-      '<td><input value="'+(r.date||d)+'" oninput="HWR['+i+'].date=this.value" placeholder="'+d+'"/></td>'+
       '<td><input value="'+r.sub+'" oninput="HWR['+i+'].sub=this.value" placeholder="Subject"/></td>'+
       '<td><input value="'+r.hw+'" oninput="HWR['+i+'].hw=this.value" placeholder="Homework / classwork description"/></td>'+
       '<td class="del-td"><button onclick="delHW('+i+')">×</button></td>'+
@@ -2098,7 +2751,7 @@ function drawDiaryTemplate1(cls, sec, date, hw, rmk, nxt, s) {
   CX.fillStyle="#FFFFFF";CX.fillRect(0,0,W,H);
   // Header
   CX.fillStyle=SC.pc;CX.fillRect(0,0,W,80);
-  CX.fillStyle="#fff";CX.font="bold 38px Arial";CX.textAlign="center";CX.fillText(SC.nm1,W/2,50);
+  CX.fillStyle="#fff";CX.font="bold 35px Arial";CX.textAlign="center";CX.fillText(SC.nm1,W/2,50);
   CX.font="11px Arial";CX.fillStyle="rgba(255,255,255,0.7)";CX.fillText(SC.nm2.split("").join("  "),W/2,70);
   drawLogo(W,0,80);
   // Title
@@ -2109,14 +2762,14 @@ function drawDiaryTemplate1(cls, sec, date, hw, rmk, nxt, s) {
   // Info bar — CLASS left, DATE right (swapped per user request)
   CX.fillStyle="#f0f2f7";CX.fillRect(20,y,W-40,42);rr(20,y,W-40,42,6,null,SC.pc+"44",1);
   CX.fillStyle=SC.pc;CX.font="bold 13px Arial";CX.textAlign="left";
-  CX.fillText("🏫 CLASS: "+(cls||"")+(sec?" — "+sec:""),30,y+26);
+  CX.fillText("🏫 Class: "+(cls||"")+(sec?" — "+sec:""),30,y+26);
   CX.textAlign="right";CX.fillText("📅 "+date,W-30,y+26);CX.textAlign="left";
   y+=46;
   // Table header
   var colW=[90,140,W-70-90-140];
   CX.fillStyle=SC.pc;CX.fillRect(20,y,W-40,30);
   CX.fillStyle="#fff";CX.font="bold 11px Arial";CX.textAlign="center";
-  CX.fillText("DATE",20+colW[0]/2,y+20);
+
   CX.fillText("SUBJECT",20+colW[0]+colW[1]/2,y+20);
   CX.fillText("HOMEWORK / CLASSWORK DETAILS",20+colW[0]+colW[1]+colW[2]/2,y+20);
   y+=30;
@@ -2126,7 +2779,7 @@ function drawDiaryTemplate1(cls, sec, date, hw, rmk, nxt, s) {
     CX.fillStyle=i%2===0?"#FFFFFF":"#F5F7FA";
     CX.fillRect(20,y,W-40,rH);rr(20,y,W-40,rH,0,null,"#DEDEE8",0.5);
     CX.fillStyle="#1a1a2e";CX.font="bold 12px Arial";CX.textAlign="center"; // darker
-    CX.fillText(r.date||"",20+colW[0]/2,y+23);
+   
     CX.fillStyle=SC.pc;CX.font="bold 13px Arial";
     CX.fillText(r.sub||"",20+colW[0]+colW[1]/2,y+23);
     CX.fillStyle="#111111";CX.font="13px Arial"; // much darker homework text
@@ -2203,7 +2856,6 @@ function drawDiaryTemplate2(cls, sec, date, hw, rmk, nxt, s) {
   var colW=[100,150,W-80-100-150];
   CX.fillStyle=SC.pc;CX.fillRect(30,y,W-60,36);
   CX.fillStyle="#fff";CX.font="bold 12px Arial";CX.textAlign="center";
-  CX.fillText("DATE",30+colW[0]/2,y+23);
   CX.fillText("SUBJECT",30+colW[0]+colW[1]/2,y+23);
   CX.fillText("HOMEWORK / CLASSWORK",30+colW[0]+colW[1]+colW[2]/2,y+23);
   y+=36;
@@ -2217,7 +2869,6 @@ function drawDiaryTemplate2(cls, sec, date, hw, rmk, nxt, s) {
     CX.fillStyle=SC.ac;CX.fillRect(30+colW[0],y,4,rH);
     
     CX.fillStyle="#333";CX.font="bold 12px Arial";CX.textAlign="center";
-    CX.fillText(r.date||"—",30+colW[0]/2,y+24);
     CX.fillStyle=SC.pc;CX.font="bold 14px Arial";
     CX.fillText(r.sub||"—",30+colW[0]+colW[1]/2,y+24);
     CX.fillStyle="#555";CX.font="12px Arial";
@@ -2292,7 +2943,6 @@ function drawDiaryTemplate3(cls, sec, date, hw, rmk, nxt, s) {
   CX.strokeStyle=SC.pc;CX.lineWidth=1.5;
   CX.strokeRect(45,y,W-90,32);
   CX.fillStyle=SC.pc;CX.font="bold 12px 'Times New Roman',serif";CX.textAlign="center";
-  CX.fillText("DATE",45+colW[0]/2,y+21);
   CX.fillText("SUBJECT",45+colW[0]+colW[1]/2,y+21);
   CX.fillText("HOMEWORK / CLASSWORK",45+colW[0]+colW[1]+colW[2]/2,y+21);
   y+=32;
@@ -2307,7 +2957,6 @@ function drawDiaryTemplate3(cls, sec, date, hw, rmk, nxt, s) {
     CX.beginPath();CX.moveTo(45+colW[0]+colW[1],y);CX.lineTo(45+colW[0]+colW[1],y+rH);CX.stroke();
     
     CX.fillStyle="#333";CX.font="bold 12px Arial";CX.textAlign="center";
-    CX.fillText(r.date||"—",45+colW[0]/2,y+22);
     CX.fillStyle=SC.pc;CX.font="bold 13px Arial";
     CX.fillText(r.sub||"—",45+colW[0]+colW[1]/2,y+22);
     CX.fillStyle="#555";CX.font="12px Arial";
@@ -2444,21 +3093,28 @@ function drawResultTemplate1(s, mks, title, year, rmk, tot, max, pct, grade) {
   CX.fillStyle="#FFFFFF";CX.fillRect(0,0,W,H);
   CX.fillStyle=SC.pc;CX.fillRect(0,0,W,85);
   CX.fillStyle="#fff";CX.font="bold 36px Arial";CX.textAlign="center";CX.fillText(SC.nm1,W/2,50);
-  CX.font="11px Arial";CX.fillStyle="rgba(255,255,255,0.7)";CX.fillText(SC.nm2.split("").join("  "),W/2,72);
+  CX.font="12px Arial";CX.fillStyle="rgba(255,255,255,0.7)";CX.fillText(SC.nm2.split("").join("  "),W/2,72);
   
   var y=105;
+   // EXAM TITLE BELOW student info
+  CX.fillStyle="#f8f9fa";CX.fillRect(20,y,W-40,50);rr(20,y,W-40,50,8,null,"#e9ecef",1);
+  CX.fillStyle=SC.pc;CX.font="bold 17px Arial";CX.textAlign="center";CX.fillText("📊 RESULT CARD — "+title+" "+year,W/2,y+32);
+  y+=65;
+
+  
   // STUDENT INFO FIRST — on top
   CX.fillStyle="#e3f2fd";CX.fillRect(20,y,W-40,55);rr(20,y,W-40,55,6,null,SC.pc,1);
-  CX.fillStyle=SC.pc;CX.font="bold 14px Arial";CX.textAlign="left";CX.fillText("👤 "+s.nm,30,y+22);
-  CX.font="12px Arial";CX.fillStyle="#555";CX.fillText("🏫 "+s.cl+(s.sec?" - "+s.sec:"")+" | Roll: "+s.rl+(s.fn?" | Father: "+s.fn:""),30,y+40);
+  CX.fillStyle=SC.pc;CX.font="bold 14px Arial";CX.textAlign="left";CX.fillText("🎓Student:  "+s.nm,30,y+22);
+CX.font="12px Arial";
+CX.fillStyle="#555";
+CX.fillText("Father: "+(s.fn?s.fn:"")+" | Class: "+s.cl+(s.sec?" - "+s.sec:"")+" | Roll: "+s.rl,30,y+40);
+
+
   CX.textAlign="right";CX.fillStyle=SC.pc;CX.font="bold 16px Arial";CX.fillText(grade,W-35,y+32);CX.textAlign="left";
   CX.fillStyle=SC.ac;CX.font="bold 10px Arial";CX.textAlign="right";CX.fillText("GRADE",W-40,y+18);CX.textAlign="left";
   y+=65;
 
-  // EXAM TITLE BELOW student info
-  CX.fillStyle="#f8f9fa";CX.fillRect(20,y,W-40,50);rr(20,y,W-40,50,8,null,"#e9ecef",1);
-  CX.fillStyle=SC.pc;CX.font="bold 17px Arial";CX.textAlign="center";CX.fillText("📊 RESULT CARD — "+title+" "+year,W/2,y+32);
-  y+=65;
+ 
   
   // Table
   var cols=[200,100,100,100,80,W-80-200-100-100-100-80];
@@ -2501,12 +3157,12 @@ function drawResultTemplate1(s, mks, title, year, rmk, tot, max, pct, grade) {
   
   if(rmk){
     CX.fillStyle="#fff3cd";CX.fillRect(20,y,W-40,35);rr(20,y,W-40,35,6,null,"#ffc107",1);
-    CX.fillStyle="#856404";CX.font="12px Arial";CX.textAlign="center";CX.fillText("📌 "+rmk,W/2,y+23);
+    CX.fillStyle="#856404";CX.font="12px Arial";CX.textAlign="center";CX.fillText("Principal Remarks "+rmk,W/2,y+23);
     y+=40;
   }
   
   CX.fillStyle=SC.pc;CX.fillRect(0,H-35,W,35);
-  CX.fillStyle="#fff";CX.font="10px Arial";CX.textAlign="center";
+  CX.fillStyle="#fff";CX.font="12px Arial";CX.textAlign="center";
   CX.fillText(SC.ph+(SC.email?" | "+SC.email:""),W/2,H-12);
   
   drawWatermark(W,H);
@@ -2536,6 +3192,14 @@ function drawResultTemplate2(s, mks, title, year, rmk, tot, max, pct, grade) {
   CX.fillStyle=SC.ac;CX.fillRect(50,105,W-100,4);
   
   var y=125;
+
+   // EXAM TITLE BELOW student info
+  CX.fillStyle="#fff";CX.fillRect(30,y,W-60,55);rr(30,y,W-60,55,10,null,SC.pc,2);
+  CX.fillStyle=SC.pc;CX.font="bold 18px Arial";CX.textAlign="center";CX.fillText("✨ RESULT CARD",W/2,y+26);
+  CX.font="12px Arial";CX.fillStyle="#666";CX.fillText(title+" — "+year,W/2,y+44);
+  y+=68;
+
+  
   // STUDENT INFO FIRST
   CX.fillStyle="#fff";CX.fillRect(30,y,W-60,58);rr(30,y,W-60,58,8,null,"#ddd",1);
   CX.fillStyle=SC.pc;CX.font="bold 14px Arial";CX.textAlign="left";CX.fillText("👤 "+s.nm,40,y+24);
@@ -2545,11 +3209,7 @@ function drawResultTemplate2(s, mks, title, year, rmk, tot, max, pct, grade) {
   CX.font="9px Arial";CX.fillStyle="#888";CX.fillText("GRADE",W-55,y+18);CX.textAlign="left";
   y+=68;
 
-  // EXAM TITLE BELOW student info
-  CX.fillStyle="#fff";CX.fillRect(30,y,W-60,55);rr(30,y,W-60,55,10,null,SC.pc,2);
-  CX.fillStyle=SC.pc;CX.font="bold 18px Arial";CX.textAlign="center";CX.fillText("✨ RESULT CARD",W/2,y+26);
-  CX.font="12px Arial";CX.fillStyle="#666";CX.fillText(title+" — "+year,W/2,y+44);
-  y+=68;
+ 
   
   var cols=[210,95,95,95,75,W-70-210-95-95-95-75];
   CX.fillStyle=SC.pc;CX.fillRect(35,y,W-70,32);
@@ -2621,38 +3281,44 @@ function drawResultTemplate3(s, mks, title, year, rmk, tot, max, pct, grade) {
   CX.beginPath();CX.moveTo(50,105);CX.lineTo(W-50,105);CX.stroke();
   
   CX.fillStyle="#fff";CX.font="bold 34px 'Times New Roman',serif";CX.textAlign="center";CX.fillText(SC.nm1,W/2,65);
-  CX.font="italic 12px 'Times New Roman',serif";CX.fillStyle=SC.ac;CX.fillText(SC.nm2,W/2,88);
-  CX.fillStyle="#fff3cd";CX.font="bold 14px 'Times New Roman',serif";CX.fillText("RESULT CARD",W/2,112);
   
-  var y=145;
-  // STUDENT INFO FIRST (on top, before exam title)
-  CX.fillStyle="#e8eaf0";CX.fillRect(45,y,W-90,46);
-  rr(45,y,W-90,46,0,null,SC.pc,1.5);
-  CX.fillStyle="#333";CX.font="14px 'Times New Roman',serif";CX.textAlign="left";
-  CX.fillText("Student: _______________________",50,y+20);
-  CX.fillStyle=SC.pc;CX.font="bold 14px Arial";CX.fillText(s.nm,145,y+20);
-  CX.fillStyle="#333";CX.font="13px 'Times New Roman',serif";
-  CX.textAlign="right";CX.fillText("Class: "+s.cl+(s.sec?"-"+s.sec:"")+"    Roll: "+(s.rl||"—"),W-50,y+20);
-  // Father name on second line if available
-  if(s.fn){CX.fillStyle="#555";CX.font="11px Arial";CX.textAlign="left";CX.fillText("Father: "+s.fn,50,y+38);}
-  CX.textAlign="left";
-  y+=56;
+  CX.fillStyle="#fff3cd";CX.font="bold 18px 'Times New Roman',serif";CX.fillText("RESULT CARD",W/2,95);
+ 
+  
+  var y=135;
 
-  // EXAM TITLE BELOW STUDENT INFO
+  
+   // EXAM TITLE BELOW STUDENT INFO
   CX.fillStyle="#f4f1e8";CX.fillRect(80,y,W-160,42);
   rr(80,y,W-160,42,0,null,SC.pc,1);
   CX.fillStyle=SC.pc;CX.font="bold 15px 'Times New Roman',serif";CX.textAlign="center";CX.fillText(title+" — "+year,W/2,y+26);
   y+=56;
+
+  
+  // STUDENT INFO FIRST (on top, before exam title)
+  CX.fillStyle="#e8eaf0";CX.fillRect(45,y,W-90,46);
+  rr(45,y,W-90,46,0,null,SC.pc,1.5);
+  CX.fillStyle="#333";CX.font="14px 'Times New Roman',serif";CX.textAlign="left";
+  CX.fillText("Student Name: _______________________",50,y+20);
+  CX.fillStyle=SC.pc;CX.font="bold 14px Arial";CX.fillText(s.nm,145,y+20);
+  CX.fillStyle="#333";CX.font="13px 'Times New Roman',serif";
+  CX.textAlign="right";CX.fillText("Class: "+s.cl+(s.sec?"-"+s.sec:"")+"    Roll: "+(s.rl||"—"),W-50,y+20);
+  // Father name on second line if available
+  if(s.fn){CX.fillStyle="#555";CX.font="11px Arial";CX.textAlign="left";CX.fillText("Father Name: "+s.fn,50,y+38);}
+  CX.textAlign="left";
+  y+=56;
+
+ 
   
   var cols=[220,90,90,90,70,W-90-220-90-90-90-70];
   CX.fillStyle="#f4f1e8";CX.fillRect(45,y,W-90,28);
   CX.strokeStyle=SC.pc;CX.lineWidth=1.5;CX.strokeRect(45,y,W-90,28);
   CX.fillStyle=SC.pc;CX.font="bold 12px 'Times New Roman',serif";CX.textAlign="center";
   CX.fillText("SUBJECT",45+cols[0]/2,y+19);
-  CX.fillText("MAX",45+cols[0]+cols[1]/2,y+19);
-  CX.fillText("OBT",45+cols[0]+cols[1]+cols[2]/2,y+19);
+  CX.fillText("TOTAL",45+cols[0]+cols[1]/2,y+19);
+  CX.fillText("OBTAINED",45+cols[0]+cols[1]+cols[2]/2,y+19);
   CX.fillText("%",45+cols[0]+cols[1]+cols[2]+cols[3]/2,y+19);
-  CX.fillText("GRD",45+cols[0]+cols[1]+cols[2]+cols[3]+cols[4]/2,y+19);
+  CX.fillText("GRADE",45+cols[0]+cols[1]+cols[2]+cols[3]+cols[4]/2,y+19);
   y+=28;
   
   mks.forEach(function(m,i){
@@ -2688,12 +3354,12 @@ function drawResultTemplate3(s, mks, title, year, rmk, tot, max, pct, grade) {
   if(rmk){
     CX.fillStyle="#f4f1e8";CX.fillRect(45,y,W-90,35);
     rr(45,y,W-90,35,0,null,SC.ac,1);
-    CX.fillStyle=SC.pc;CX.font="italic 12px 'Times New Roman',serif";CX.textAlign="center";CX.fillText("📌 "+rmk,W/2,y+23);
+    CX.fillStyle=SC.pc;CX.font="italic 12px 'Times New Roman',serif";CX.textAlign="center";CX.fillText("Principal Remarks : "+rmk,W/2,y+23);
     y+=40;
   }
   
   CX.fillStyle=SC.pc;CX.fillRect(25,H-45,W-50,30);
-  CX.fillStyle="#fff";CX.font="10px 'Times New Roman',serif";CX.textAlign="center";
+  CX.fillStyle="#fff";CX.font="12px 'Times New Roman',serif";CX.textAlign="center";
   CX.fillText(SC.ph+(SC.email?" | "+SC.email:""),W/2,H-22);
   
   drawWatermark(W,H);
@@ -2717,6 +3383,7 @@ function delSub(i){if(SUBS.length>1){SUBS.splice(i,1);renderSubs();}else toast("
 
 function genR(sid){
   var s=STUDENTS.find(function(x){return x.id===sid;});if(!s)return;
+  _lastRN=s.nm;_rPhone=s.ph||'';
   var mks=SUBS.filter(function(s){return s.nm.trim()&&s.ob.trim();});
   if(!mks.length){toast("Enter marks for at least 1 subject.");return;}
   var title=G("r-title").value,year=G("r-year").value,rmk=G("r-rmk").value;
@@ -2738,7 +3405,8 @@ function genR(sid){
 }
 
 // ══ PDF AUTO-EXTRACT ══════════════════════════════════
-function handlePDF(input){
+function handlePDF(input){  if(!requirePro("PDF Extractor")){input.value="";return;}
+
   var file=input.files[0];if(!file)return;
   if(typeof pdfjsLib==="undefined"){toast("PDF library loading...");return;}
   pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
@@ -3117,15 +3785,17 @@ function genF(){
     if(!selFeeStudent){toast("Select a student from the list.");return;}
     sNm=selFeeStudent.nm;sFn=selFeeStudent.fn;sCl=selFeeStudent.cl+(selFeeStudent.sec?" / "+selFeeStudent.sec:"");sRl=selFeeStudent.rl;sPh=selFeeStudent.ph;
   }
+  _lastFN=sNm;_fPhone=sPh||'';
   var month=G("f-month").value,due=G("f-due").value;
   var jazz=G("f-jazz").value,easy=G("f-easy").value,bank=G("f-bank").value,note=G("f-note").value;
   var items=FeeRows.filter(function(r){return r.label;});
   var total=items.reduce(function(a,r){return a+Number(r.amt||0);},0);
   
-  var tpl = TEMPLATES.fee;
-  if(tpl === 1) drawFeeTemplate1(sNm, sFn, sCl, sRl, month, due, items, total, jazz, easy, bank, note, sPh);
-  else if(tpl === 2) drawFeeTemplate2(sNm, sFn, sCl, sRl, month, due, items, total, jazz, easy, bank, note, sPh);
-  else drawFeeTemplate3(sNm, sFn, sCl, sRl, month, due, items, total, jazz, easy, bank, note, sPh);
+  var tpl=TEMPLATES.fee;
+  if(tpl===1)drawFeeTemplate1(sNm,sFn,sCl,sRl,month,due,items,total,jazz,easy,bank,note,sPh);
+  else if(tpl===2)drawFeeTemplate2(sNm,sFn,sCl,sRl,month,due,items,total,jazz,easy,bank,note,sPh);
+  else if(tpl===3)drawFeeTemplate3(sNm,sFn,sCl,sRl,month,due,items,total,jazz,easy,bank,note,sPh);
+  else if(tpl===4)drawFeeTemplateUrdu(sNm,sFn,sCl,sRl,month,due,items,total,jazz,easy,bank,note,sPh);
   
   var msg="*💳 "+SC.nm1+" — Fee Slip*\n*"+month+"*\n\n*"+sNm+"*  |  "+sCl+"\n\n";
   items.forEach(function(r){msg+="▸ "+r.label+":  Rs. "+r.amt+"\n";});
@@ -3669,21 +4339,1077 @@ function extendPlan(uid,days){db.collection("schools").doc(uid).get().then(funct
 function blockSchool(uid){if(!confirm("Block this school?"))return;db.collection("schools").doc(uid).update({planExpiry:new Date("2020-01-01").toISOString()}).then(function(){toast("Blocked");loadAdminPanel();});}
 
 // ══ AUTH STATE ════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+// FEATURE 1: WHATSAPP BUSINESS CLOUD API AUTO-SEND
+// ══════════════════════════════════════════════════════
+var WA_PHONE_ID = "";
+var WA_TOKEN = "";
+
+function saveWAKey(){
+  var pid=G("wa-phone-id").value.trim(),tok=G("wa-token").value.trim();
+  if(!pid||!tok){toast("Enter both Phone Number ID and Access Token.");return;}
+  WA_PHONE_ID=pid; WA_TOKEN=tok;
+  try{localStorage.setItem("wa_pid",pid);localStorage.setItem("wa_tok",tok);}catch(e){}
+  G("wa-api-status").textContent="✅ Saved";G("wa-api-status").style.color="var(--gn)";
+  toast("WA API credentials saved ✅");
+  showAutoSendBtns();
+}
+function loadWAKey_old(){
+  try{
+    var pid=localStorage.getItem("wa_pid"),tok=localStorage.getItem("wa_tok");
+    if(pid&&tok){
+      WA_PHONE_ID=pid;WA_TOKEN=tok;
+      if(G("wa-phone-id"))G("wa-phone-id").value=pid;
+      if(G("wa-token"))G("wa-token").value=tok;
+      G("wa-api-status").textContent="✅ Connected";G("wa-api-status").style.color="var(--gn)";
+      showAutoSendBtns();
+    }
+  }catch(e){}
+}
+function showAutoSendBtns(){
+  if(!WA_PHONE_ID||!WA_TOKEN)return;
+  ["f-autosend-btn"].forEach(function(id){var el=G(id);if(el)el.style.display="block";});
+}
+function testWAApi(){
+  if(!WA_PHONE_ID||!WA_TOKEN){toast("Save credentials first.");return;}
+  G("wa-api-status").textContent="⏳ Testing...";
+  // Test by fetching phone number info
+  fetch("https://graph.facebook.com/v18.0/"+WA_PHONE_ID+"?fields=display_phone_number,verified_name",{
+    headers:{"Authorization":"Bearer "+WA_TOKEN}
+  }).then(function(r){return r.json();})
+  .then(function(d){
+    if(d.display_phone_number){
+      G("wa-api-status").textContent="✅ "+d.verified_name+" ("+d.display_phone_number+")";
+      G("wa-api-status").style.color="var(--gn)";
+      toast("WA API connected ✅ — "+d.display_phone_number);
+    } else {
+      G("wa-api-status").textContent="❌ "+(d.error?d.error.message:"Invalid credentials");
+      G("wa-api-status").style.color="var(--rd)";
+    }
+  }).catch(function(e){
+    G("wa-api-status").textContent="❌ "+e.message;G("wa-api-status").style.color="var(--rd)";
+  });
+}
+
+// Send a text message via WA Cloud API
+function waSendMsg(toPhone, message, onSuccess, onError){
+  if(!WA_PHONE_ID||!WA_TOKEN){if(onError)onError("No API credentials. Save in Settings.");return;}
+  // Normalize phone: ensure it starts with country code (Pakistan 92)
+  var ph = toPhone.replace(/\D/g,"");
+  if(ph.startsWith("0"))ph="92"+ph.slice(1);
+  if(!ph.startsWith("92")&&ph.length===10)ph="92"+ph;
+  fetch("https://graph.facebook.com/v18.0/"+WA_PHONE_ID+"/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+WA_TOKEN},
+    body:JSON.stringify({
+      messaging_product:"whatsapp",
+      to:ph,
+      type:"text",
+      text:{body:message}
+    })
+  }).then(function(r){return r.json();})
+  .then(function(d){
+    if(d.messages&&d.messages[0]){if(onSuccess)onSuccess(d.messages[0].id);}
+    else{if(onError)onError(d.error?d.error.message:"Failed");}
+  }).catch(function(e){if(onError)onError(e.message);});
+}
+
+// Auto-send from any output panel (fee, diary etc.)
+function autoSendCard(pre){
+  if(!WA_PHONE_ID||!WA_TOKEN){toast("Set WA API credentials in Settings first.");return;}
+  var msg=G(pre+"-mw")?G(pre+"-mw").textContent:"";
+  // Determine recipient phone
+  var ph="";
+  if(pre==="f"&&selFeeStudent)ph=selFeeStudent.ph;
+  if(!msg){toast("Generate the card first.");return;}
+  if(!ph){toast("No phone number available. Use manual entry mode.");return;}
+  var btn=G(pre+"-autosend-btn");
+  if(btn){btn.textContent="⏳ Sending...";btn.disabled=true;}
+  waSendMsg(ph,msg,function(id){
+    toast("✅ Sent via WhatsApp API!");
+    if(btn){btn.textContent="✅ Sent!";btn.style.background="#1A7A4A";}
+    // Log sent message to Firestore
+    if(CU&&db){
+      db.collection("schools").doc(CU.uid).collection("waLog").add({
+        to:ph,type:pre,sentAt:new Date().toISOString(),msgId:id
+      });
+    }
+  },function(err){
+    toast("❌ Send failed: "+err);
+    if(btn){btn.textContent="⚡ Auto-Send via WA Business API";btn.disabled=false;}
+  });
+}
+
+
+// ══════════════════════════════════════════════════════
+// FEATURE 2: FEE PAYMENT TRACKER
+// ══════════════════════════════════════════════════════
+var _ftOpen = false;
+var _feePayments = {}; // {studentId: {paid:bool,amount:num,date:str}}
+
+function toggleFeeTracker(){
+  _ftOpen=!_ftOpen;
+  G("ft-body").style.display=_ftOpen?"block":"none";
+  G("ft-arrow").style.transform=_ftOpen?"rotate(180deg)":"";
+  if(_ftOpen){
+    // Set default month
+    if(!G("ft-month").value) G("ft-month").value=nmth();
+    loadFeeTracker();
+  }
+}
+
+function loadFeeTracker(){
+  var month=G("ft-month").value.trim();
+  var cls=G("ft-cls").value;
+  if(!month){G("ft-table").innerHTML='<div style="padding:14px;text-align:center;color:var(--t2);font-size:12px">Enter a month (e.g. Mar 2026)</div>';return;}
+  if(!CU){return;}
+  var docId=month.replace(/\s/g,"-").replace(/[^a-zA-Z0-9\-]/g,"");
+  G("ft-table").innerHTML='<div class="loader"><div class="spin"></div>Loading...</div>';
+  db.collection("schools").doc(CU.uid).collection("feePayments").doc(docId).get()
+    .then(function(doc){
+      _feePayments=doc.exists?(doc.data().payments||{}):{};
+      renderFeeTracker(month,cls);
+    }).catch(function(){_feePayments={};renderFeeTracker(month,cls);});
+}
+
+function renderFeeTracker(month,cls){
+  var list=cls?STUDENTS.filter(function(s){return s.cl===cls;}):STUDENTS;
+  if(!list.length){
+    G("ft-table").innerHTML='<div style="padding:14px;text-align:center;color:var(--t2);font-size:12px">No students found. Add students first.</div>';
+    return;
+  }
+  var paidCount=0,pendCount=0,paidAmt=0,pendAmt=0;
+  var html='<div style="display:grid;grid-template-columns:1fr 55px 70px 60px;gap:6px;padding:8px 10px;font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;border-bottom:2px solid var(--gy);background:var(--gy)">'+
+    '<span>Student</span><span style="text-align:center">Fee</span><span style="text-align:center">Status</span><span></span></div>';
+  list.forEach(function(s){
+    var fp=_feePayments[s.id]||{};
+    var paid=!!fp.paid;
+    var amt=fp.amount||s.fe||0;
+    if(paid){paidCount++;paidAmt+=Number(amt);}else{pendCount++;pendAmt+=Number(s.fe||0);}
+    html+='<div class="ft-row">'+
+      '<div><div style="font-weight:700;font-size:12px">'+s.nm+'</div><div style="font-size:9px;color:var(--t2)">'+s.cl+(s.sec?" "+s.sec:"")+' · Roll '+s.rl+'</div></div>'+
+      '<div style="text-align:center;font-size:11px;font-weight:700">'+Number(s.fe||0).toLocaleString()+'</div>'+
+      '<div>'+(paid?'<div class="ft-badge-paid">✅ Paid</div><div style="font-size:9px;color:var(--t2);text-align:center;margin-top:2px">'+(fp.date||"")+'</div>':'<div class="ft-badge-pend">⏰ Pending</div>')+'</div>'+
+      '<button class="'+(paid?'ft-unpay-btn':'ft-pay-btn')+'" onclick="togglePaid(\''+s.id+'\',\''+month+'\','+(paid?'false':'true')+','+Number(s.fe||0)+')">'+
+        (paid?'Undo':'Paid ✅')+'</button>'+
+    '</div>';
+  });
+  G("ft-table").innerHTML=html;
+  // Update stats
+  var total=paidAmt+pendAmt;
+  G("ft-paid-count").textContent=paidCount;
+  G("ft-pend-count").textContent=pendCount;
+  G("ft-paid-amt").textContent="Rs. "+paidAmt.toLocaleString();
+  G("ft-pend-amt").textContent="Rs. "+pendAmt.toLocaleString();
+  G("ft-collect-pct").textContent=(total?Math.round(paidAmt/total*100):0)+"%";
+  G("ft-total-lbl").textContent="of Rs. "+total.toLocaleString();
+}
+
+function togglePaid(sid,month,setPaid,amt){
+  if(!CU)return;
+  var docId=month.replace(/\s/g,"-").replace(/[^a-zA-Z0-9\-]/g,"");
+  if(setPaid){
+    _feePayments[sid]={paid:true,amount:amt,date:new Date().toLocaleDateString("en-PK",{day:"numeric",month:"short"})};
+  } else {
+    _feePayments[sid]={paid:false,amount:amt,date:""};
+  }
+  db.collection("schools").doc(CU.uid).collection("feePayments").doc(docId)
+    .set({month:month,payments:_feePayments,updatedAt:new Date().toISOString()},{merge:true})
+    .then(function(){
+      toast(setPaid?"✅ Marked as paid":"↩️ Marked as pending");
+      renderFeeTracker(month,G("ft-cls").value);
+    }).catch(function(e){toast("Error: "+e.message);});
+}
+
+function sendPendingReminders(){
+  var month=G("ft-month").value.trim()||nmth();
+  var cls=G("ft-cls").value;
+  var list=cls?STUDENTS.filter(function(s){return s.cl===cls;}):STUDENTS;
+  var pending=list.filter(function(s){return !(_feePayments[s.id]&&_feePayments[s.id].paid);});
+  if(!pending.length){toast("No pending students!");return;}
+  var sent=0;
+  pending.forEach(function(s){
+    var msg="Assalam o Alaikum *"+(s.pr||s.fn||"Parent")+"*\n\n"+
+      "Fee reminder from *"+SC.nm1+"*.\n\n"+
+      "📚 *Student:* "+s.nm+"\n🏫 *Class:* "+s.cl+"\n"+
+      "📅 *Month:* "+month+"\n💰 *Amount:* Rs. "+s.fe+"\n\n"+
+      "Kindly clear the fee at your earliest.\n\n_"+SC.nm1+" Management_";
+    if(WA_PHONE_ID&&WA_TOKEN){
+      waSendMsg(s.ph,msg,function(){},function(){});sent++;
+    } else {
+      if(sent===0)window.open(waUrl(s.ph,msg),"_blank");
+      sent++;
+    }
+  });
+  toast("Reminders sent to "+pending.length+" pending parents"+(WA_PHONE_ID?" via API ✅":" via WA ✅"));
+}
+
+function exportFeeReport(){
+  var month=G("ft-month").value.trim()||nmth();
+  var cls=G("ft-cls").value;
+  var list=cls?STUDENTS.filter(function(s){return s.cl===cls;}):STUDENTS;
+  var txt=SC.nm1+" — Fee Report\nMonth: "+month+(cls?" | Class: "+cls:"")+"\n"+"=".repeat(40)+"\n\n";
+  var paid=[],pend=[];
+  list.forEach(function(s){
+    var fp=_feePayments[s.id]||{};
+    if(fp.paid)paid.push(s);else pend.push(s);
+  });
+  txt+="PAID ("+paid.length+"):\n";
+  paid.forEach(function(s,i){txt+=(i+1)+". "+s.nm+" — "+s.cl+" — Rs. "+s.fe+" — Paid: "+(_feePayments[s.id].date||"—")+"\n";});
+  txt+="\nPENDING ("+pend.length+"):\n";
+  pend.forEach(function(s,i){txt+=(i+1)+". "+s.nm+" — "+s.cl+" — Rs. "+s.fe+" — Ph: "+s.ph+"\n";});
+  var blob=new Blob([txt],{type:"text/plain"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download=SC.nm1.replace(/\s/g,"_")+"_Fee_"+month.replace(/\s/g,"-")+".txt";a.click();
+  toast("✅ Report exported!");
+}
+
+
+// ══════════════════════════════════════════════════════
+// FEATURE 3: DAILY ATTENDANCE
+// ══════════════════════════════════════════════════════
+var _attData = {}; // {studentId: "P"/"A"}
+var _attStudents = [];
+
+function initAttendance(){
+  // Set today's date
+  var today=new Date();
+  var yyyy=today.getFullYear(),mm=String(today.getMonth()+1).padStart(2,"0"),dd=String(today.getDate()).padStart(2,"0");
+  if(G("att-date")&&!G("att-date").value) G("att-date").value=yyyy+"-"+mm+"-"+dd;
+  // populate class dropdown from students
+  var cls=clsList();
+  var sel=G("att-cls");
+  if(sel){
+    sel.innerHTML='<option value="">— Select Class —</option>';
+    cls.forEach(function(c){var o=document.createElement("option");o.value=c;o.text=c;sel.appendChild(o);});
+  }
+}
+
+function loadAttendanceStudents(){
+  var cls=G("att-cls").value;
+  var dt=G("att-date").value;
+  if(!cls){G("att-list").style.display="none";G("att-actions").style.display="none";G("att-stats").style.display="none";return;}
+  _attStudents=STUDENTS.filter(function(s){return s.cl===cls;});
+  if(!_attStudents.length){toast("No students in "+cls);return;}
+  // Load saved attendance from Firestore if exists
+  if(CU&&dt){
+    var docId=dt+"-"+cls.replace(/\s/g,"_");
+    db.collection("schools").doc(CU.uid).collection("attendance").doc(docId).get()
+      .then(function(doc){
+        _attData=doc.exists?(doc.data().records||{}):{};
+        renderAttendanceRows();
+      }).catch(function(){_attData={};renderAttendanceRows();});
+  } else {
+    _attData={};renderAttendanceRows();
+  }
+}
+
+function renderAttendanceRows(){
+  var rows="";
+  _attStudents.forEach(function(s){
+    var st=_attData[s.id]||"P"; // default Present
+    rows+='<div class="att-stu-row">'+
+      '<div class="att-name">'+s.nm+'<div class="att-sub">Roll '+s.rl+'</div></div>'+
+      '<button class="att-p'+(st==="P"?" on":"")+'" id="att-p-'+s.id+'" onclick="setAtt(\''+s.id+'\',\'P\')">P</button>'+
+      '<button class="att-a'+(st==="A"?" on":"")+'" id="att-a-'+s.id+'" onclick="setAtt(\''+s.id+'\',\'A\')">A</button>'+
+    '</div>';
+  });
+  G("att-rows").innerHTML=rows;
+  G("att-list").style.display="block";
+  G("att-actions").style.display="block";
+  G("att-stats").style.display="flex";
+  updateAttStats();
+}
+
+function setAtt(sid,val){
+  _attData[sid]=val;
+  var pBtn=G("att-p-"+sid),aBtn=G("att-a-"+sid);
+  if(pBtn){pBtn.classList.toggle("on",val==="P");}
+  if(aBtn){aBtn.classList.toggle("on",val==="A");}
+  updateAttStats();
+}
+
+function updateAttStats(){
+  var p=0,a=0;
+  _attStudents.forEach(function(s){if((_attData[s.id]||"P")==="P")p++;else a++;});
+  G("att-p-count").textContent=p;
+  G("att-a-count").textContent=a;
+  G("att-pct").textContent=_attStudents.length?Math.round(p/_attStudents.length*100)+"%":"—";
+}
+
+function markAllPresent(){
+  _attStudents.forEach(function(s){setAtt(s.id,"P");});
+  toast("All marked Present ✅");
+}
+function markAllAbsent(){
+  _attStudents.forEach(function(s){setAtt(s.id,"A");});
+  toast("All marked Absent");
+}
+
+function saveAndGenAttendance(){
+  var cls=G("att-cls").value;
+  var dt=G("att-date").value;
+  if(!cls||!dt){toast("Select class and date first.");return;}
+  var docId=dt+"-"+cls.replace(/\s/g,"_");
+  // Fill defaults for unmarked (default Present)
+  _attStudents.forEach(function(s){if(!_attData[s.id])_attData[s.id]="P";});
+  // Save to Firestore
+  if(CU){
+    db.collection("schools").doc(CU.uid).collection("attendance").doc(docId)
+      .set({class:cls,date:dt,records:_attData,savedAt:new Date().toISOString()},{merge:true})
+      .catch(function(){});
+  }
+  // Generate card — use selected template
+  if(ATT_TPL===2)drawAttendanceCardUrdu(cls,dt,_attStudents,_attData);
+  else drawAttendanceCard(cls,dt,_attStudents,_attData);
+  // Build WA message summary
+  var present=[],absent=[];
+  _attStudents.forEach(function(s){if((_attData[s.id]||"P")==="P")present.push(s.nm);else absent.push(s.nm);});
+  var dateStr=new Date(dt).toLocaleDateString("en-PK",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  var msg="*📋 Attendance — "+SC.nm1+"*\n*"+cls+"  |  "+dateStr+"*\n\n";
+  msg+="✅ *Present ("+present.length+"):* "+present.join(", ")+"\n\n";
+  if(absent.length)msg+="❌ *Absent ("+absent.length+"):* "+absent.join(", ")+"\n\n";
+  msg+="📊 *Attendance: "+Math.round(present.length/_attStudents.length*100)+"%*\n\n_"+SC.nm1+"  ·  "+SC.ph+"_";
+  G("att-mw").textContent=msg;
+  G("att-wa").href="https://wa.me/"+CFG.supportWA+"?text="+encodeURIComponent(msg);
+  G("att-out").style.display="block";
+  setTimeout(function(){G("att-out").scrollIntoView({behavior:"smooth",block:"nearest"});},150);
+  toast("✅ Attendance saved & card generated!");
+}
+
+function notifyAbsentParents(){
+  var absent=_attStudents.filter(function(s){return (_attData[s.id]||"P")==="A";});
+  if(!absent.length){toast("No absent students today!");return;}
+  var dt=G("att-date").value;
+  var dateStr=dt?new Date(dt).toLocaleDateString("en-PK",{weekday:"long",day:"numeric",month:"long"}):td();
+  var sent=0;
+  absent.forEach(function(s){
+    var msg="Assalam o Alaikum *"+(s.pr||s.fn||"Parent")+"*\n\n"+
+      "This is to inform you that your child *"+s.nm+"* was *absent* today.\n\n"+
+      "📅 Date: "+dateStr+"\n🏫 Class: "+s.cl+"\n\n"+
+      "Please ensure regular attendance. Contact us for any queries.\n\n"+
+      "_"+SC.nm1+(SC.ph?" · "+SC.ph:"")+"_";
+    if(WA_PHONE_ID&&WA_TOKEN){
+      waSendMsg(s.ph,msg,function(){},function(){});sent++;
+    } else {
+      if(sent===0)window.open(waUrl(s.ph,msg),"_blank");
+      sent++;
+    }
+  });
+  toast("Absence notifications sent to "+absent.length+" parents"+(WA_PHONE_ID?" via API ✅":" via WA ✅"));
+}
+
+function drawAttendanceCard(cls,dt,students,data){
+  var W=CW;
+  var rH=30,rows=students.length;
+  var H=90+60+50+Math.max(rows,1)*rH+50;
+  beginC(W,H);
+  // Header
+  CX.fillStyle=SC.pc;CX.fillRect(0,0,W,80);
+  CX.fillStyle="#fff";CX.font="bold 28px Arial";CX.textAlign="center";CX.fillText(SC.nm1,W/2,46);
+  CX.font="10px Arial";CX.fillStyle="rgba(255,255,255,0.7)";CX.fillText(SC.nm2,W/2,64);
+  drawLogo(W,0,80);
+  // Title bar
+  var y=85;
+  CX.fillStyle="#F0F4FF";CX.fillRect(15,y,W-30,45);rr(15,y,W-30,45,7,null,SC.pc,1.5);
+  CX.fillStyle=SC.pc;CX.font="bold 15px Arial";CX.textAlign="center";CX.fillText("📋 DAILY ATTENDANCE",W/2,y+20);
+  var dateStr=dt?new Date(dt).toLocaleDateString("en-PK",{weekday:"short",day:"numeric",month:"short",year:"numeric"}):td();
+  CX.font="11px Arial";CX.fillStyle="#555";CX.fillText(cls+"  ·  "+dateStr,W/2,y+38);
+  y+=55;
+  // Stats bar
+  var pCnt=0,aCnt=0;
+  students.forEach(function(s){if((data[s.id]||"P")==="P")pCnt++;else aCnt++;});
+  CX.fillStyle=SC.pc;CX.fillRect(15,y,W-30,38);
+  CX.fillStyle="#fff";CX.font="bold 12px Arial";CX.textAlign="left";
+  CX.fillText("✅ Present: "+pCnt,25,y+24);
+  CX.textAlign="center";CX.fillText("❌ Absent: "+aCnt,W/2,y+24);
+  CX.textAlign="right";CX.fillText(Math.round(pCnt/students.length*100)+"% Attendance",W-25,y+24);
+  CX.textAlign="left";y+=45;
+  // Table header
+  var c1=30,c2=W-c1-60;
+  CX.fillStyle="#E8EBF0";CX.fillRect(15,y,W-30,26);
+  CX.fillStyle=SC.pc;CX.font="bold 10px Arial";CX.textAlign="left";CX.fillText("STUDENT",20,y+17);
+  CX.textAlign="right";CX.fillText("STATUS",W-20,y+17);CX.textAlign="left";y+=26;
+  // Rows
+  students.forEach(function(s,i){
+    var st=(data[s.id]||"P")==="P";
+    CX.fillStyle=i%2===0?"#fff":"#F8FAFF";CX.fillRect(15,y,W-30,rH);
+    rr(15,y,W-30,rH,0,null,"#E8EBF0",0.5);
+    CX.fillStyle="#333";CX.font="bold 11px Arial";CX.textAlign="left";
+    CX.fillText(s.nm,20,y+20);
+    CX.font="10px Arial";CX.fillStyle="#999";CX.fillText("Roll "+s.rl,20,y+rH-5);
+    // Status badge
+    var bx=W-70,by=y+7,bw=50,bh=rH-14;
+    CX.fillStyle=st?"#E8F5E9":"#FDEDEC";rr(bx,by,bw,bh,6,st?"#E8F5E9":"#FDEDEC",null,0);
+    CX.fillStyle=st?var_gn:var_rd;CX.font="bold 11px Arial";CX.textAlign="center";
+    CX.fillText(st?"✅ P":"❌ A",bx+bw/2,by+bh/2+4);CX.textAlign="left";
+    y+=rH;
+  });
+  // Footer
+  CX.fillStyle=SC.pc;CX.fillRect(0,H-38,W,38);
+  CX.fillStyle="#fff";CX.font="10px Arial";CX.textAlign="center";
+  CX.fillText(SC.ph+(SC.email?" | "+SC.email:""),W/2,H-14);
+  drawWatermark(W,H);endC("att-img",W);
+}
+
+// Helper for colors inside canvas (CX vars can't reference CSS vars)
+var var_gn="#1A7A4A",var_rd="#C0392B";
+
+
+// ══════════════════════════════════════════════════════
+// PHASE 2 ROADMAP (NOT BUILT — ARCHITECTURAL CHANGES NEEDED)
+// ══════════════════════════════════════════════════════
+/*
+  FEATURE 4: Multi-Teacher Login
+  Architecture needed:
+  - schools/{uid}/teachers subcollection with {email, class, name, role:"teacher"}
+  - Firebase Custom Claims to scope teacher access to their class only
+  - Separate "Teacher Login" tab in auth screen
+  - Teacher signs in → reads their class assignment → sees only their class data
+  - Do this when you have 5+ paying schools to justify the auth complexity
+
+  FEATURE 5: Parent Portal
+  Architecture needed:
+  - Separate URL (e.g. classcard-parent.vercel.app) or query param ?parent=true
+  - Parent logs in with phone number (Firebase Phone Auth or magic link)
+  - Read-only access to their child's data: cards, attendance, fee status
+  - Push notifications via WA API when new card is generated
+  - Do this after multi-teacher is stable
+*/
+
+
+
+
+// ════════════════════════════════════════════════
+// CARD VIEWER + SMART WA
+// ════════════════════════════════════════════════
+var _cv={img:'',msg:'',phone:'',fname:''};
+
+function showCardViewer(imgId,msg,phone,fname){
+  var el=G(imgId);
+  if(!el||!el.src||el.src===location.href){toast('Generate card first.');return;}
+  _cv={img:el.src,msg:msg||'',phone:phone||'',fname:fname||'card'};
+  G('cv-img').src=el.src;
+  var mb=G('cv-msg-box');
+  if(msg&&msg.trim()){mb.textContent=msg.trim();mb.style.display='block';}
+  else{mb.style.display='none';}
+  var hint=G('cv-hint'),wb=G('cv-wa-btn');
+  if(WA_PHONE_ID&&WA_TOKEN&&phone){
+    wb.textContent='⚡ Auto-Send + Download';
+    hint.textContent='WA API connected — sends text automatically, card downloads for your records';
+  } else if(phone){
+    wb.textContent='📱 Open WhatsApp (message ready)';
+    hint.textContent='WhatsApp opens with message typed — tap Send, then attach card';
+  } else {
+    wb.textContent='📱 Open WhatsApp';
+    hint.textContent='Share message to group, then attach downloaded card';
+  }
+  G('cv-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function cvClose(){G('cv-modal').classList.remove('open');document.body.style.overflow='';}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')cvClose();});
+document.addEventListener('click',function(e){if(e.target.id==='cv-modal')cvClose();});
+
+function cvSend(){
+  var wb=G('cv-wa-btn');
+  if(WA_PHONE_ID&&WA_TOKEN&&_cv.phone&&_cv.msg){
+    wb.textContent='⏳ Sending...';wb.disabled=true;
+    waSendMsg(_cv.phone,_cv.msg,function(id){
+      wb.textContent='✅ Sent via API!';wb.style.background='linear-gradient(135deg,#1A7A4A,#0D5C35)';
+      G('cv-hint').textContent='✅ Delivered. Downloading card for your records...';
+      cvDownload();
+      if(CU&&db)db.collection('schools').doc(CU.uid).collection('waLog').add({to:_cv.phone,fname:_cv.fname,at:new Date().toISOString(),id:id});
+      setTimeout(function(){wb.textContent='⚡ Auto-Send + Download';wb.disabled=false;wb.style.background='';},5000);
+    },function(err){
+      toast('API failed: '+err+' — opening WhatsApp');
+      wb.textContent='📱 Open WhatsApp';wb.disabled=false;
+      _cvOpenWA();
+    });
+  } else {
+    _cvOpenWA();
+    // Auto-download after short delay so user can attach
+    setTimeout(cvDownload,600);
+  }
+}
+
+function _cvOpenWA(){
+  var url;
+  if(_cv.phone&&_cv.msg) url=waUrl(_cv.phone,_cv.msg);
+  else if(_cv.msg) url='https://wa.me/?text='+encodeURIComponent(_cv.msg);
+  else url='https://wa.me/';
+  window.open(url,'_blank');
+  G('cv-hint').textContent='Card downloading — attach it in WhatsApp after sending message';
+}
+
+function cvDownload(){
+  if(!_cv.img)return;
+  var a=document.createElement('a');
+  a.href=_cv.img;
+  a.download=(_cv.fname||'card').replace(/[^\w\-]/g,'_')+'.png';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  toast('💾 Card saved — attach in WhatsApp');
+}
+
+function cvCopyMsg(){
+  if(!_cv.msg){toast('No message to copy.');return;}
+  if(navigator.clipboard){navigator.clipboard.writeText(_cv.msg).then(function(){toast('✅ Message copied!');});}
+  else{var t=document.createElement('textarea');t.value=_cv.msg;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);toast('✅ Copied!');}
+}
+
+// ════════════════════════════════════════════════
+// DOWNLOAD CARD HELPER
+// ════════════════════════════════════════════════
+function dlCard(imgId,fname){
+  var el=G(imgId);if(!el||!el.src||el.src===location.href){toast('Generate card first.');return;}
+  var a=document.createElement('a');a.href=el.src;
+  a.download=(fname||'card').replace(/[^\w\-]/g,'_')+'.png';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  toast('💾 Saved to Downloads');
+}
+
+// ════════════════════════════════════════════════
+// TEMPLATES — remember last used per section
+// ════════════════════════════════════════════════
+var TEMPLATES={diary:1,result:1,fee:1,ds:1,notice:1,tt:1,att:1};
+try{Object.assign(TEMPLATES,JSON.parse(localStorage.getItem('cc_tpl')||'{}'));}catch(e){}
+function selectTemplate(type,num,el){
+  TEMPLATES[type]=num;
+  el.parentElement.querySelectorAll('.tpl-card').forEach(function(c){c.classList.remove('on');});
+  el.classList.add('on');
+  try{var t=JSON.parse(localStorage.getItem('cc_tpl')||'{}');t[type]=num;localStorage.setItem('cc_tpl',JSON.stringify(t));}catch(e){}
+  toast('Template '+num+' selected');
+}
+// Apply saved templates on load
+function applySavedTemplates(){
+  ['diary','result','fee','ds','notice','tt'].forEach(function(type){
+    var n=TEMPLATES[type]||1;
+    var cards=document.querySelectorAll('[onclick*="selectTemplate(\''+type+'\'"]');
+    if(cards.length>=n){
+      cards.forEach(function(c){c.classList.remove('on');});
+      cards[n-1].classList.add('on');
+    }
+  });
+}
+
+// ════════════════════════════════════════════════
+// NAV — updated with new pages
+// ════════════════════════════════════════════════
+function navTo(id,btn){
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.nbtn').forEach(function(b){b.classList.remove('on');});
+  var pg=G('pg-'+id);if(!pg){toast('Page not found: '+id);return;}
+  pg.classList.add('on');if(btn)btn.classList.add('on');
+  if(id==='diary')initDiary();
+  if(id==='results')initRes();
+  if(id==='fees')initFees();
+  if(id==='ds')initDS();
+  if(id==='settings'){lpv();loadAllAPIKeys();}
+  if(id==='admin'){loadAdminPanel();loadAllAPIKeys();}
+  if(id==='attend')initAttendance();
+  if(id==='timetable')initTimetable();
+  if(id==='dashboard')loadDashboard();
+}
+
+// ════════════════════════════════════════════════
+// REFRESH DROPDOWNS — including new ones
+// ════════════════════════════════════════════════
+function refreshDrops(){
+  var cls=clsList();
+  ['r-cls','f-cls','att-cls','ft-cls','r-db-cls'].forEach(function(id){
+    var el=G(id);if(!el)return;
+    var cur=el.value;
+    el.innerHTML='<option value="">All Classes</option>';
+    cls.forEach(function(c){var o=document.createElement('option');o.value=c;o.text=c;el.add(o);});
+    if(cur)el.value=cur;
+  });
+  var a=G('att-cls');if(a&&a.options[0])a.options[0].text='— Select Class —';
+  // Fee month dropdown — last 12 months
+  var fm=G('ft-month');
+  if(fm&&fm.tagName==='SELECT'){
+    var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var now=new Date();
+    fm.innerHTML='<option value="">— Select Month —</option>';
+    for(var i=0;i<12;i++){
+      var d=new Date(now.getFullYear(),now.getMonth()-i,1);
+      var lbl=months[d.getMonth()]+' '+d.getFullYear();
+      var o=document.createElement('option');o.value=lbl;o.text=lbl;
+      if(i===0)o.selected=true;
+      fm.add(o);
+    }
+  }
+}
+
+// ════════════════════════════════════════════════
+// fS — search with class filter for results
+// ════════════════════════════════════════════════
+function fS(pre){
+  var srch=G(pre+'-srch')||G(pre+'-srch2');
+  var q=srch?srch.value.toLowerCase():'';
+  var showAll=pre!=='f'&&pre!=='r';
+  var clsF='';
+  if(pre==='r'){var ce=G('r-db-cls');if(ce)clsF=ce.value;}
+  var list=STUDENTS.filter(function(s){
+    var mq=!q||(s.nm.toLowerCase().includes(q)||(s.rl&&s.rl.includes(q)));
+    var mc=!clsF||s.cl===clsF;
+    return mq&&mc;
+  });
+  if(!q&&!showAll&&!clsF)list=[];
+  var c=G(pre+'-stds');if(!c)return;
+  if(!q&&!showAll&&!clsF){c.innerHTML='<div style="padding:8px;color:var(--t2);font-size:12px;text-align:center">Type name or select class</div>';return;}
+  c.innerHTML=list.map(function(s){return'<button class="sbtn" onclick="selStu(\''+pre+'\',\''+s.id+'\')"><div class="sn">'+s.nm+'</div><div class="sd">'+s.cl+(s.sec?' '+s.sec:'')+' · '+s.rl+'</div></button>';}).join('');
+  if(!list.length)c.innerHTML='<div style="padding:10px;color:var(--t2);font-size:12px;text-align:center">No students found</div>';
+}
+
+// ════════════════════════════════════════════════
+// TRACK phones for viewer
+// ════════════════════════════════════════════════
+var _rPhone='',_lastRN='Result',_fPhone='',_lastFN='Fee';
+
+// ════════════════════════════════════════════════
+// SHOW APP — updated
+// ════════════════════════════════════════════════
+function showApp(){
+  if(appStarted)return;appStarted=true;
+  G('splash').classList.add('hide');setTimeout(function(){G('splash').style.display='none';},400);
+  G('auth-screen').style.display='none';G('app-screen').style.display='flex';
+  if(isAdmin){
+    var aS=G('sb-admin-sec');if(aS)aS.style.display='block';
+    var rB=G('sb-role-badge');if(rB){rB.className='sb-role admin-r';rB.textContent='👑 Admin / Founder';rB.style.display='block';}
+    showAdminOCRNote();loadAllAPIKeys();
+  } else if(CU_ROLE==='teacher'){
+    var fS2=G('sb-fee-sec');if(fS2)fS2.style.display='none';
+    var sS=G('sb-settings-sec');if(sS)sS.style.display='none';
+    var tb=G('tchr-banner');if(tb)tb.style.display='flex';
+    var tl=G('tchr-class-lbl');if(tl&&CU_CLASS)tl.textContent=CU_CLASS;
+    var rB=G('sb-role-badge');if(rB){rB.className='sb-role teacher-r';rB.textContent='🏫 Teacher — '+(CU_CLASS||'');rB.style.display='block';}
+    var qf=G('qnav-fees');if(qf){qf.style.opacity='0.3';qf.style.pointerEvents='none';}
+  } else {
+    var rB=G('sb-role-badge');if(rB){rB.className='sb-role principal-r';rB.textContent='🏫 Principal';rB.style.display='block';}
+    // Add Dashboard link to settings sidebar
+    var ssub=document.querySelector('#sb-settings-sec .sb-sub');
+    if(ssub&&!G('sb-dash-link')){
+      var di=document.createElement('div');di.id='sb-dash-link';di.className='sb-item';
+      di.innerHTML='📊 Dashboard';di.onclick=function(){sbNav('dashboard');};
+      ssub.insertBefore(di,ssub.firstChild);
+    }
+  }
+  if(CSD){
+    var sn=G('sb-school-nm');if(sn)sn.textContent=CSD.name||'School';
+    var li=G('sb-logo-init');if(li)li.textContent=(CSD.name||'SC').substring(0,2).toUpperCase();
+    var rl=G('sb-role-lbl');if(rl)rl.textContent=isAdmin?'Admin':CU_ROLE==='teacher'?'Teacher':'Principal';
+  }
+  initForms();loadTeachers();applySavedTemplates();
+  navTo('attend',G('qnav-attend'));
+}
+
+// ════════════════════════════════════════════════
+// LOAD / SAVE ALL API KEYS
+// ════════════════════════════════════════════════
+function loadAllAPIKeys(){
+  try{
+    var pid=localStorage.getItem('wa_pid'),tok=localStorage.getItem('wa_tok');
+    if(pid){WA_PHONE_ID=pid;if(G('wa-phone-id'))G('wa-phone-id').value=pid;}
+    if(tok){WA_TOKEN=tok;if(G('wa-token'))G('wa-token').value=tok;}
+    if(pid&&tok&&G('wa-api-status')){G('wa-api-status').textContent='✅ WA Connected';G('wa-api-status').style.color='var(--gn)';}
+    var ak=localStorage.getItem('ant_key');if(ak){ANTHROPIC_KEY=ak;if(G('anthropic-key'))G('anthropic-key').value=ak;}
+    var gk=localStorage.getItem('gvision_key');if(gk){GOOGLE_VISION_KEY=gk;if(G('google-vision-key'))G('google-vision-key').value=gk;}
+    var mk=localStorage.getItem('mistral_key');if(mk&&G('mistral-key'))G('mistral-key').value=mk;
+    var op=localStorage.getItem('ocr_prov');if(op&&G('ocr-provider'))G('ocr-provider').value=op;
+    if(WA_PHONE_ID&&WA_TOKEN)showAutoSendBtns();
+  }catch(e){}
+}
+function saveAllAdminKeys(){
+  var pid=G('wa-phone-id')?G('wa-phone-id').value.trim():'';
+  var tok=G('wa-token')?G('wa-token').value.trim():'';
+  var ak=G('anthropic-key')?G('anthropic-key').value.trim():'';
+  var gk=G('google-vision-key')?G('google-vision-key').value.trim():'';
+  var mk=G('mistral-key')?G('mistral-key').value.trim():'';
+  var op=G('ocr-provider')?G('ocr-provider').value:'anthropic';
+  try{
+    if(pid)localStorage.setItem('wa_pid',pid);
+    if(tok)localStorage.setItem('wa_tok',tok);
+    if(ak)localStorage.setItem('ant_key',ak);
+    if(gk)localStorage.setItem('gvision_key',gk);
+    if(mk)localStorage.setItem('mistral_key',mk);
+    localStorage.setItem('ocr_prov',op);
+  }catch(e){}
+  if(pid)WA_PHONE_ID=pid;if(tok)WA_TOKEN=tok;
+  if(ak)ANTHROPIC_KEY=ak;if(gk)GOOGLE_VISION_KEY=gk;
+  if(WA_PHONE_ID&&WA_TOKEN){if(G('wa-api-status')){G('wa-api-status').textContent='✅ Connected';G('wa-api-status').style.color='var(--gn)';};showAutoSendBtns();}
+  toast('✅ All keys saved');
+}
+
+// ════════════════════════════════════════════════
+// PRINCIPAL DASHBOARD
+// ════════════════════════════════════════════════
+function loadDashboard(){
+  if(G('db-students'))G('db-students').textContent=STUDENTS.length;
+  if(G('db-classes'))G('db-classes').textContent=clsList().length;
+  if(CSD){
+    var pl=CSD.plan||'trial',po=CFG.plans[pl]||CFG.plans.trial;
+    var exp=CSD.planExpiry?new Date(CSD.planExpiry).toLocaleDateString('en-PK',{day:'numeric',month:'short',year:'numeric'}):'—';
+    if(G('db-plan'))G('db-plan').textContent=po.name;
+    if(G('db-exp'))G('db-exp').textContent='Expires: '+exp;
+  }
+  if(CU&&CU_ROLE!=='teacher'){
+    db.collection('schools').doc(CU.uid).collection('teachers').get()
+      .then(function(s){if(G('db-teachers'))G('db-teachers').textContent=s.size;}).catch(function(){});
+    var month=nmth();
+    var docId=month.replace(/\s/g,'-').replace(/[^a-zA-Z0-9\-]/g,'');
+    db.collection('schools').doc(CU.uid).collection('feePayments').doc(docId).get()
+      .then(function(d){
+        var p=d.exists?(d.data().payments||{}):{};
+        var pend=STUDENTS.filter(function(s){return !(p[s.id]&&p[s.id].paid);}).length;
+        if(G('db-pending'))G('db-pending').textContent=pend;
+      }).catch(function(){if(G('db-pending'))G('db-pending').textContent=STUDENTS.length;});
+  }
+  var bd=G('db-breakdown');
+  if(bd){
+    if(!STUDENTS.length){bd.innerHTML='<div style="color:var(--t2)">No students yet.</div>';return;}
+    var total=STUDENTS.length;
+    bd.innerHTML='<div style="display:flex;flex-direction:column;gap:5px">'+
+      clsList().map(function(cl){
+        var n=STUDENTS.filter(function(s){return s.cl===cl;}).length;
+        var p=Math.round(n/total*100);
+        return '<div style="display:flex;align-items:center;gap:8px">'
+          +'<div style="min-width:80px;font-size:12px;font-weight:700;color:var(--pr)">'+cl+'</div>'
+          +'<div style="flex:1;height:7px;background:var(--gy);border-radius:4px;overflow:hidden"><div style="width:'+p+'%;height:100%;background:linear-gradient(90deg,var(--pr),var(--ac));border-radius:4px"></div></div>'
+          +'<div style="min-width:24px;font-size:11px;font-weight:700;color:var(--t2);text-align:right">'+n+'</div></div>';
+      }).join('')+'</div>';
+  }
+}
+
+// ════════════════════════════════════════════════
+// TIMETABLE
+// ════════════════════════════════════════════════
+var TTR=[
+  {p:'1st',m:'',t:'',w:'',th:'',f:''},
+  {p:'2nd',m:'',t:'',w:'',th:'',f:''},
+  {p:'3rd',m:'',t:'',w:'',th:'',f:''},
+  {p:'4th',m:'',t:'',w:'',th:'',f:''},
+  {p:'5th',m:'',t:'',w:'',th:'',f:''},
+  {p:'6th',m:'',t:'',w:'',th:'',f:''},
+  {p:'7th',m:'',t:'',w:'',th:'',f:''}
+];
+function initTimetable(){if(!G('tt-rows').innerHTML.trim())renderTTRows();}
+function renderTTRows(){
+  var c=G('tt-rows');if(!c)return;
+  var inp='padding:4px 5px;font-size:10px;border:1.5px solid var(--bd);border-radius:5px;width:100%';
+  c.innerHTML=TTR.map(function(r,i){
+    return'<div style="display:grid;grid-template-columns:55px 1fr 1fr 1fr 1fr 1fr 24px;gap:3px;margin-bottom:3px">'
+      +'<input value="'+r.p+'" oninput="TTR['+i+'].p=this.value" placeholder="1st" style="'+inp+';text-align:center"/>'
+      +'<input value="'+r.m+'" oninput="TTR['+i+'].m=this.value" placeholder="—" style="'+inp+'"/>'
+      +'<input value="'+r.t+'" oninput="TTR['+i+'].t=this.value" placeholder="—" style="'+inp+'"/>'
+      +'<input value="'+r.w+'" oninput="TTR['+i+'].w=this.value" placeholder="—" style="'+inp+'"/>'
+      +'<input value="'+r.th+'" oninput="TTR['+i+'].th=this.value" placeholder="—" style="'+inp+'"/>'
+      +'<input value="'+r.f+'" oninput="TTR['+i+'].f=this.value" placeholder="—" style="'+inp+'"/>'
+      +'<button onclick="TTR.splice('+i+',1);renderTTRows()" style="background:#FDEDEC;color:var(--rd);border:none;border-radius:4px;cursor:pointer;font-size:13px">×</button>'
+      +'</div>';
+  }).join('');
+}
+function addTTRow(){TTR.push({p:(TTR.length+1)+'th',m:'',t:'',w:'',th:'',f:''});renderTTRows();}
+function genTimetable(){
+  var cls=G('tt-class').value.trim(),yr=G('tt-year').value.trim(),tchr=G('tt-teacher').value.trim();
+  var rows=TTR.filter(function(r){return r.m||r.t||r.w||r.th||r.f;});
+  if(!rows.length){toast('Fill at least one period.');return;}
+  var W=CW,days=['Period','Monday','Tuesday','Wednesday','Thursday','Friday'];
+  var rH=32,hH=90,iH=40,tH=28;
+  var H=hH+iH+tH+(rows.length*rH)+46;
+  var tpl=TEMPLATES.tt||1;
+  beginC(W,H);
+  if(tpl===1){
+    CX.fillStyle='#fff';CX.fillRect(0,0,W,H);
+    CX.fillStyle=SC.pc;CX.fillRect(0,0,W,hH);
+  } else if(tpl===2){
+    var g=CX.createLinearGradient(0,0,W,H);g.addColorStop(0,'#f5f7fa');g.addColorStop(1,'#e4e8ec');
+    CX.fillStyle=g;CX.fillRect(0,0,W,H);
+    var hg=CX.createLinearGradient(0,0,W,0);hg.addColorStop(0,SC.pc);hg.addColorStop(1,SC.ac);
+    CX.fillStyle=hg;CX.fillRect(0,0,W,hH);
+  } else {
+    CX.fillStyle='#FFFEF5';CX.fillRect(0,0,W,H);
+    rr(10,10,W-20,H-20,0,null,SC.pc,3);rr(18,18,W-36,H-36,0,null,SC.ac,1);
+    CX.fillStyle=SC.pc;CX.fillRect(25,25,W-50,hH-20);
+  }
+  CX.fillStyle='#fff';CX.font='bold 28px Arial';CX.textAlign='center';CX.fillText(SC.nm1,W/2,46);
+  CX.font='11px Arial';CX.fillStyle='rgba(255,255,255,0.75)';CX.fillText(SC.nm2,W/2,68);
+  drawLogo(W,0,hH);
+  var y=hH+6;
+  CX.fillStyle=SC.ac;CX.fillRect(20,y,W-40,34);
+  CX.fillStyle=SC.pc;CX.font='bold 13px Arial';CX.textAlign='center';
+  CX.fillText('CLASS TIMETABLE'+(cls?' — '+cls:''),W/2,y+23);y+=40;
+  CX.fillStyle=tpl===2?'rgba(255,255,255,0.6)':'#f8f9fa';CX.fillRect(20,y,W-40,28);
+  CX.fillStyle=SC.pc;CX.font='11px Arial';CX.textAlign='left';
+  CX.fillText('Year: '+yr,30,y+19);
+  if(tchr){CX.textAlign='right';CX.fillText('Teacher: '+tchr,W-30,y+19);}
+  CX.textAlign='left';y+=34;
+  var cW=Math.floor((W-40)/6);
+  CX.fillStyle=SC.pc;CX.fillRect(20,y,W-40,tH);
+  CX.fillStyle='#fff';CX.font='bold 10px Arial';CX.textAlign='center';
+  days.forEach(function(d,i){CX.fillText(d,20+i*cW+cW/2,y+19);});
+  y+=tH;
+  rows.forEach(function(r,i){
+    CX.fillStyle=i%2===0?'#fff':'#F4F6FA';CX.fillRect(20,y,W-40,rH);
+    CX.strokeStyle='#E0E3EC';CX.lineWidth=0.5;CX.strokeRect(20,y,W-40,rH);
+    var vals=[r.p,r.m,r.t,r.w,r.th,r.f];
+    vals.forEach(function(v,j){
+      CX.fillStyle=j===0?SC.pc:'#333';CX.font=j===0?'bold 11px Arial':'12px Arial';
+      CX.textAlign='center';CX.fillText(v||'—',20+j*cW+cW/2,y+21);
+    });
+    y+=rH;
+  });
+  CX.fillStyle=SC.pc;CX.fillRect(0,H-38,W,38);
+  CX.fillStyle='#fff';CX.font='10px Arial';CX.textAlign='center';
+  CX.fillText(SC.nm1+' · '+SC.ph+(SC.email?' · '+SC.email:''),W/2,H-13);
+  drawWatermark(W,H);endC('tt-img',W);
+  G('tt-out').style.display='block';
+  setTimeout(function(){G('tt-out').scrollIntoView({behavior:'smooth',block:'nearest'});},150);
+}
+
+// ════════════════════════════════════════════════
+// ATTENDANCE — Urdu template + CSV export
+// ════════════════════════════════════════════════
+var ATT_TPL=1;
+function updateAttTplBtns(){
+  var en=G('att-tpl-en'),ur=G('att-tpl-ur');
+  if(!en||!ur)return;
+  if(ATT_TPL===1){en.className='btn bpr bsm';en.style.flex='1';ur.className='btn bgh bsm';ur.style.flex='1';}
+  else{ur.className='btn bpr bsm';ur.style.flex='1';en.className='btn bgh bsm';en.style.flex='1';}
+}
+
+function drawAttendanceCardUrdu(cls,dt,students,data){
+  var W=CW,rH=30,rows=students.length;
+  var H=90+60+50+Math.max(rows,1)*rH+50;
+  beginC(W,H);
+  CX.fillStyle='#FFFEF8';CX.fillRect(0,0,W,H);
+  rr(8,8,W-16,H-16,0,null,SC.pc,2);
+  CX.fillStyle=SC.pc;CX.fillRect(20,20,W-40,68);
+  CX.fillStyle='#fff';CX.font='bold 26px Arial';CX.textAlign='center';CX.fillText(SC.nm1,W/2,50);
+  CX.font='11px Arial';CX.fillStyle=SC.ac;CX.fillText(SC.nm2,W/2,68);
+  drawLogo(W,20,75);
+  var y=100;
+  CX.fillStyle=SC.ac;CX.fillRect(20,y,W-40,38);
+  CX.fillStyle=SC.pc;CX.font='bold 14px Arial';CX.textAlign='center';CX.fillText('📋 حاضری رجسٹر',W/2,y+15);
+  var ds=dt?new Date(dt).toLocaleDateString('en-PK',{weekday:'short',day:'numeric',month:'short',year:'numeric'}):td();
+  CX.font='11px Arial';CX.fillStyle='#444';CX.fillText(cls+' · '+ds,W/2,y+32);y+=46;
+  var pC=0,aC=0;
+  students.forEach(function(s){if((data[s.id]||'P')==='P')pC++;else aC++;});
+  CX.fillStyle=SC.pc;CX.fillRect(20,y,W-40,30);
+  CX.fillStyle='#fff';CX.font='bold 11px Arial';
+  CX.textAlign='left';CX.fillText('حاضر: '+pC,30,y+21);
+  CX.textAlign='center';CX.fillText('غیر حاضر: '+aC,W/2,y+21);
+  CX.textAlign='right';CX.fillText(Math.round(pC/students.length*100)+'% حاضری',W-25,y+21);
+  CX.textAlign='left';y+=38;
+  CX.fillStyle='#E8EBF0';CX.fillRect(20,y,W-40,22);
+  CX.fillStyle=SC.pc;CX.font='bold 10px Arial';
+  CX.textAlign='right';CX.fillText('نام',W-25,y+15);
+  CX.textAlign='left';CX.fillText('حاضری',25,y+15);y+=22;
+  students.forEach(function(s,i){
+    var st=(data[s.id]||'P')==='P';
+    CX.fillStyle=i%2===0?'#fff':'#F8FAFF';CX.fillRect(20,y,W-40,rH);
+    CX.fillStyle='#333';CX.font='bold 11px Arial';CX.textAlign='right';CX.fillText(s.nm,W-25,y+20);
+    CX.font='10px Arial';CX.fillStyle='#999';CX.textAlign='right';CX.fillText('رول: '+s.rl,W-25,y+rH-5);
+    var bx=25,by=y+6,bw=52,bh=rH-12;
+    CX.fillStyle=st?'#E8F5E9':'#FDEDEC';rr(bx,by,bw,bh,5,st?'#E8F5E9':'#FDEDEC',null,0);
+    CX.fillStyle=st?'#1A7A4A':'#C0392B';CX.font='bold 11px Arial';CX.textAlign='center';
+    CX.fillText(st?'✅ P':'❌ A',bx+bw/2,by+bh/2+4);
+    y+=rH;
+  });
+  CX.fillStyle=SC.pc;CX.fillRect(0,H-38,W,38);
+  CX.fillStyle='#fff';CX.font='10px Arial';CX.textAlign='center';
+  CX.fillText(SC.ph+(SC.email?' | '+SC.email:''),W/2,H-14);
+  drawWatermark(W,H);endC('att-img',W);
+}
+
+function exportAttendanceCSV(){
+  if(!_attStudents.length){toast('Load attendance first.');return;}
+  var cls=G('att-cls').value,dt=G('att-date').value;
+  var csv='Name,Roll,Class,Status\n';
+  _attStudents.forEach(function(s){csv+=s.nm+','+s.rl+','+s.cl+','+(_attData[s.id]||'P')+'\n';});
+  var b=new Blob([csv],{type:'text/csv'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download=(cls||'Class').replace(/\s/g,'_')+'_'+dt+'_Attendance.csv';
+  a.click();toast('✅ CSV exported');
+}
+
+// ════════════════════════════════════════════════
+// FEE URDU TEMPLATE
+// ════════════════════════════════════════════════
+function drawFeeTemplateUrdu(nm,fn,cls,rl,month,due,items,total,jazz,easy,bank,note,ph){
+  var W=CW,iH=28,H=150+75+46+(items.length*iH)+60+(jazz||easy||bank?44:0)+(note?30:0)+46;
+  beginC(W,H);
+  CX.fillStyle='#FFFEF8';CX.fillRect(0,0,W,H);
+  rr(8,8,W-16,H-16,0,null,SC.ac,2);rr(16,16,W-32,H-32,0,null,SC.pc,1);
+  CX.fillStyle=SC.pc;CX.fillRect(20,20,W-40,95);
+  CX.fillStyle='#fff';CX.font='bold 26px Arial';CX.textAlign='center';CX.fillText(SC.nm1,W/2,54);
+  CX.font='12px Arial';CX.fillStyle=SC.ac;CX.fillText(SC.nm2,W/2,78);
+  CX.fillStyle='#fff3cd';CX.font='bold 13px Arial';CX.fillText('فیس ادائیگی رسید',W/2,98);
+  drawLogo(W,20,100);
+  var y=128;
+  CX.fillStyle='#F0F4FF';CX.fillRect(20,y,W-40,52);rr(20,y,W-40,52,6,null,SC.pc,1);
+  CX.fillStyle=SC.pc;CX.font='bold 12px Arial';CX.textAlign='right';CX.fillText('نام: '+nm,W-28,y+20);
+  CX.font='11px Arial';CX.fillStyle='#555';CX.fillText('کلاس: '+cls+(rl?'  رول: '+rl:''),W-28,y+40);
+  CX.textAlign='left';CX.fillText('والد: '+fn,28,y+40);
+  y+=60;
+  CX.fillStyle=SC.pc;CX.fillRect(20,y,W-40,30);
+  CX.fillStyle='#fff';CX.font='bold 12px Arial';CX.textAlign='center';
+  CX.fillText('ماہ: '+month+'  |  آخری تاریخ: '+due,W/2,y+21);y+=38;
+  CX.fillStyle='#E8EBF0';CX.fillRect(20,y,W-40,24);
+  CX.fillStyle=SC.pc;CX.font='bold 10px Arial';
+  CX.textAlign='right';CX.fillText('مد',W-28,y+17);
+  CX.textAlign='left';CX.fillText('رقم (روپے)',28,y+17);y+=24;
+  items.forEach(function(it,i){
+    CX.fillStyle=i%2===0?'#fff':'#F8FAFF';CX.fillRect(20,y,W-40,iH);
+    CX.fillStyle='#333';CX.font='12px Arial';CX.textAlign='right';CX.fillText(it.label||'—',W-28,y+iH-7);
+    CX.textAlign='left';CX.fillStyle='#1A7A4A';CX.font='bold 12px Arial';CX.fillText('Rs. '+it.amt,28,y+iH-7);
+    y+=iH;
+  });
+  CX.fillStyle=SC.pc;CX.fillRect(20,y,W-40,34);
+  CX.fillStyle='#fff';CX.font='bold 14px Arial';CX.textAlign='right';
+  CX.fillText('کل: Rs. '+total,W-28,y+23);y+=42;
+  if(jazz||easy||bank){
+    CX.fillStyle='#F0F4FF';CX.fillRect(20,y,W-40,38);rr(20,y,W-40,38,6,null,SC.pc,1);
+    CX.font='10px Arial';CX.fillStyle='#333';CX.textAlign='center';
+    var ps='';if(jazz)ps+='JazzCash: '+jazz+'  ';if(easy)ps+='EasyPaisa: '+easy;
+    CX.fillText(ps,W/2,y+15);if(bank)CX.fillText('Bank: '+bank,W/2,y+30);y+=44;
+  }
+  if(note){CX.fillStyle='#FFF8E1';CX.fillRect(20,y,W-40,26);CX.fillStyle='#856404';CX.font='11px Arial';CX.textAlign='center';CX.fillText('📌 '+note,W/2,y+18);y+=30;}
+  CX.fillStyle=SC.pc;CX.fillRect(0,H-38,W,38);
+  CX.fillStyle='#fff';CX.font='10px Arial';CX.textAlign='center';
+  CX.fillText(SC.ph+(SC.email?' | '+SC.email:''),W/2,H-14);
+  drawWatermark(W,H);endC('f-img',W);
+}
+
+// ════════════════════════════════════════════════
+// CSV IMPORT (Students section)
+// ════════════════════════════════════════════════
+var _csvRows=[];
+function dlCSVTemplate(){
+  var c='Full Name,Roll No,Class,Section,Monthly Fee,Father Name,Parent WhatsApp,Parent Name\n'
+    +'Ahmad Ali,001,Class 4,A,1500,Mr. Ali Hassan,03001234567,Mrs. Ali\n'
+    +'Fatima Malik,002,Class 4,A,1500,Mr. Malik Saeed,03009876543,Mrs. Malik\n';
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));
+  a.download='Classcard_Import_Template.csv';a.click();toast('✅ Template downloaded');
+}
+function handleCSV(input){
+  var file=input.files[0];if(!file)return;
+  var r=new FileReader();
+  r.onload=function(e){
+    var rows=e.target.result.split('\n').map(function(r){return r.trim();}).filter(Boolean);
+    if(rows.length<2){toast('CSV empty.');return;}
+    var stds=[];
+    for(var i=1;i<rows.length;i++){
+      var c=rows[i].split(',').map(function(v){return v.trim().replace(/"/g,'');});
+      if(!c[0]||c[0].startsWith('('))continue;
+      stds.push({nm:c[0]||'',rl:c[1]||'',cl:c[2]||'Class 1',sec:c[3]||'',fe:Number(c[4])||1000,fn:c[5]||'',ph:c[6]||'',pr:c[7]||''});
+    }
+    if(!stds.length){toast('No valid rows found.');return;}
+    _csvRows=stds;
+    var info=G('csv-info'),tbl=G('csv-tbl'),prev=G('csv-prev');
+    if(info)info.textContent='✅ Found '+stds.length+' students — review:';
+    if(tbl){
+      var h='<table style="width:100%;border-collapse:collapse"><tr style="background:var(--pr);color:#fff">';
+      ['Name','Roll','Class','Fee','Phone'].forEach(function(c){h+='<th style="padding:5px 7px;font-size:10px">'+c+'</th>';});
+      h+='</tr>';
+      stds.slice(0,12).forEach(function(s,i){
+        h+='<tr style="background:'+(i%2?'#F8FAFF':'#fff')+'">';
+        [s.nm,s.rl,s.cl,s.fe,s.ph].forEach(function(v){h+='<td style="padding:4px 7px;font-size:11px;border-bottom:1px solid var(--gy)">'+v+'</td>';});
+        h+='</tr>';
+      });
+      if(stds.length>12)h+='<tr><td colspan="5" style="padding:6px;text-align:center;font-size:10px;color:var(--t2)">...and '+(stds.length-12)+' more</td></tr>';
+      h+='</table>';tbl.innerHTML=h;
+    }
+    if(prev)prev.style.display='block';
+  };
+  r.readAsText(file);input.value='';
+}
+function doCSVImport(){
+  if(!_csvRows.length||!CU){toast('Nothing to import.');return;}
+  G('csv-prev').style.display='none';G('csv-prog').style.display='block';
+  var bar=G('csv-bar2'),stat=G('csv-stat');
+  if(bar)bar.style.width='20%';if(stat)stat.textContent='Importing '+_csvRows.length+' students...';
+  var ref=db.collection('schools').doc(CU.uid).collection('students');
+  var batch=db.batch();
+  _csvRows.forEach(function(s){batch.set(ref.doc(),Object.assign({},s,{createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}));});
+  batch.commit().then(function(){
+    if(bar)bar.style.width='100%';
+    if(stat)stat.textContent='✅ '+_csvRows.length+' students imported!';
+    db.collection('schools').doc(CU.uid).update({studentCount:firebase.firestore.FieldValue.increment(_csvRows.length)}).catch(function(){});
+    _csvRows=[];
+    setTimeout(function(){G('csv-prog').style.display='none';if(bar)bar.style.width='0%';toast('✅ Import complete!');},2000);
+  }).catch(function(e){if(stat)stat.textContent='❌ '+e.message;});
+}
+
+// ════════════════════════════════════════════════
+// SAVE API KEY — keep original working (for OCR)
+// ════════════════════════════════════════════════
+function saveApiKey(){saveAllAdminKeys();}
+
 if(auth){
   auth.onAuthStateChanged(function(user){
     if(user&&!appStarted){
       db.collection("admins").doc(user.uid).get().then(function(doc){
         if((doc.exists&&doc.data().isAdmin===true)||user.email===CFG.adminEmail){
-          isAdmin=true;loadAdminDash();
-        } else {isAdmin=false;loadSchoolData(user);}
+          isAdmin=true;CU_ROLE="admin";loadAdminDash();
+        } else {
+          isAdmin=false;
+          // Check if this email is a teacher in ANY school
+          db.collectionGroup("teachers").where("email","==",user.email.toLowerCase()).where("active","==",true).get()
+            .then(function(tsnap){
+              if(!tsnap.empty){
+                var td=tsnap.docs[0].data();
+                var schoolUID=tsnap.docs[0].ref.parent.parent.id;
+                CU_ROLE="teacher";CU_CLASS=td.assignedClass||"";
+                // Load school data of the principal (the parent doc)
+                user._schoolUID=schoolUID;
+                loadSchoolDataAsTeacher(user,schoolUID,td);
+              } else {
+                CU_ROLE="principal";loadSchoolData(user);
+              }
+            }).catch(function(){CU_ROLE="principal";loadSchoolData(user);});
+        }
       }).catch(function(){
-        if(user.email===CFG.adminEmail){isAdmin=true;loadAdminDash();}
-        else{isAdmin=false;loadSchoolData(user);}
+        if(user.email===CFG.adminEmail){isAdmin=true;CU_ROLE="admin";loadAdminDash();}
+        else{isAdmin=false;CU_ROLE="principal";loadSchoolData(user);}
       });
     }
     else if(!user&&!appStarted){setTimeout(function(){G("splash").classList.add("hide");setTimeout(function(){G("splash").style.display="none";G("auth-screen").style.display="flex";},400);},900);}
   });
 }
+
+function loadSchoolDataAsTeacher(user,schoolUID,teacherData){
+  CU=user;
+  db.collection("schools").doc(schoolUID).get().then(function(doc){
+    if(doc.exists){CSD=doc.data();applySD(CSD);loadStudents(schoolUID);}
+    showApp();loadGlobalNotice();loadLogo();
+    // Teachers cannot write — disable write buttons
+    setTimeout(function(){
+      ["saveStudent","deleteStudent","saveWAKey","saveBranding"].forEach(function(fn){
+        // Disable form actions for teachers via UI
+      });
+      document.querySelectorAll(".btn.bgn,.btn.brd").forEach(function(b){
+        var txt=b.textContent;
+        if(txt.includes("Save")||txt.includes("Delete")||txt.includes("Add Student")){
+          b.style.opacity="0.4";b.style.pointerEvents="none";b.title="Read-only: contact principal";
+        }
+      });
+    },600);
+  }).catch(function(){showApp();});
+}
 </script>
+
+<!-- CARD VIEWER MODAL -->
+<div id="cv-modal">
+  <button id="cv-close" onclick="cvClose()">✕</button>
+  <img id="cv-img" src="" alt=""/>
+  <div class="cv-msg" id="cv-msg-box"></div>
+  <div id="cv-btns">
+    <button class="cv-btn-wa" id="cv-wa-btn" onclick="cvSend()">📱 Send via WhatsApp</button>
+    <button class="cv-btn-copy" onclick="cvCopyMsg()">📋 Copy</button>
+    <button class="cv-btn-dl" onclick="cvDownload()">💾 Save</button>
+  </div>
+  <div class="cv-hint" id="cv-hint">Message pre-typed in WhatsApp — just tap Send, then attach card</div>
+</div>
 </body>
 </html>
